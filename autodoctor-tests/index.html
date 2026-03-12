@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AutoDoctor AI — Test Cases</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; font-family: 'Inter', sans-serif; }
+    :root {
+      --bg: #080808; --surface: #111; --surface2: #181818;
+      --border: #1f1f1f; --border2: #2a2a2a;
+      --text: #f5f5f5; --muted: #666; --subtle: #444;
+      --orange: #f97316; --red: #ef4444;
+      --green: #22c55e; --blue: #60a5fa; --yellow: #fbbf24;
+    }
+    body { background: var(--bg); color: var(--text); min-height: 100vh; margin: 0; }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 4px; }
+
+    /* Header */
+    .header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 32px; height: 64px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; backdrop-filter: blur(20px); }
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .logo-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--orange), var(--red)); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; box-shadow: 0 0 20px rgba(249,115,22,0.25); }
+    .header-title { font-size: 17px; font-weight: 800; letter-spacing: -0.3px; }
+    .header-sub { font-size: 12px; color: var(--muted); margin-top: 1px; }
+    .header-meta { display: flex; align-items: center; gap: 12px; }
+    .meta-pill { background: var(--surface2); border: 1px solid var(--border2); border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 600; color: var(--muted); }
+    .meta-pill span { color: var(--text); }
+
+    /* Progress bar */
+    .progress-bar { height: 3px; background: var(--border2); }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--orange), var(--red)); transition: width 0.4s ease; }
+
+    /* Layout */
+    .layout { display: grid; grid-template-columns: 260px 1fr; min-height: calc(100vh - 67px); }
+
+    /* Sidebar */
+    .sidebar { background: var(--surface); border-right: 1px solid var(--border); padding: 20px 0; position: sticky; top: 67px; height: calc(100vh - 67px); overflow-y: auto; }
+    .sidebar-section { margin-bottom: 8px; }
+    .sidebar-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); padding: 8px 20px 4px; }
+    .sidebar-item { display: flex; align-items: center; justify-content: space-between; padding: 9px 20px; cursor: pointer; transition: all 0.15s; font-size: 13px; font-weight: 500; color: var(--muted); border-left: 2px solid transparent; }
+    .sidebar-item:hover { background: rgba(255,255,255,0.03); color: var(--text); }
+    .sidebar-item.active { background: rgba(249,115,22,0.07); color: var(--orange); border-left-color: var(--orange); }
+    .sidebar-item.done { color: var(--green); }
+    .sidebar-item.done.active { background: rgba(34,197,94,0.07); border-left-color: var(--green); }
+    .sidebar-count { font-size: 11px; font-weight: 700; background: var(--surface2); border: 1px solid var(--border2); border-radius: 20px; padding: 1px 7px; }
+    .sidebar-stats { padding: 16px 20px; border-top: 1px solid var(--border); margin-top: 8px; }
+    .sidebar-stat-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 12px; }
+    .sidebar-stat-label { color: var(--muted); }
+    .sidebar-stat-val { font-weight: 700; }
+
+    /* Main */
+    .main { padding: 32px; max-width: 900px; }
+
+    /* Suite header */
+    .suite-header { margin-bottom: 28px; }
+    .suite-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(249,115,22,0.1); border: 1px solid rgba(249,115,22,0.25); border-radius: 20px; padding: 4px 12px; font-size: 11px; font-weight: 700; color: var(--orange); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+    .suite-title { font-size: 26px; font-weight: 900; letter-spacing: -0.5px; margin: 0 0 6px; }
+    .suite-desc { font-size: 14px; color: var(--muted); line-height: 1.6; max-width: 600px; }
+
+    /* Test case card */
+    .test-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; margin-bottom: 12px; overflow: hidden; transition: border-color 0.2s; }
+    .test-card:hover { border-color: var(--border2); }
+    .test-card.pass { border-left: 3px solid var(--green); }
+    .test-card.fail { border-left: 3px solid var(--red); }
+    .test-card.skip { border-left: 3px solid var(--muted); }
+    .test-card.pending { border-left: 3px solid var(--border2); }
+
+    .test-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; cursor: pointer; }
+    .test-header-left { display: flex; align-items: center; gap: 12px; }
+    .test-id { font-size: 11px; font-weight: 700; color: var(--muted); background: var(--surface2); border: 1px solid var(--border2); border-radius: 6px; padding: 2px 8px; font-family: monospace; }
+    .test-name { font-size: 14px; font-weight: 700; }
+    .test-header-right { display: flex; align-items: center; gap: 10px; }
+    .priority-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.3px; }
+    .p-critical { background: rgba(248,113,113,0.12); color: #f87171; border: 1px solid rgba(248,113,113,0.25); }
+    .p-high { background: rgba(251,146,60,0.1); color: #fb923c; border: 1px solid rgba(251,146,60,0.25); }
+    .p-medium { background: rgba(251,191,36,0.1); color: #fbbf24; border: 1px solid rgba(251,191,36,0.25); }
+    .p-low { background: rgba(74,222,128,0.1); color: #4ade80; border: 1px solid rgba(74,222,128,0.25); }
+
+    .status-btn { display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700; padding: 5px 12px; border-radius: 8px; border: none; cursor: pointer; transition: all 0.15s; }
+    .status-btn.pending { background: var(--surface2); color: var(--muted); border: 1px solid var(--border2); }
+    .status-btn.pass { background: rgba(34,197,94,0.12); color: #4ade80; border: 1px solid rgba(34,197,94,0.25); }
+    .status-btn.fail { background: rgba(248,113,113,0.12); color: #f87171; border: 1px solid rgba(248,113,113,0.25); }
+    .status-btn.skip { background: rgba(96,165,250,0.1); color: #60a5fa; border: 1px solid rgba(96,165,250,0.25); }
+
+    .chevron { font-size: 12px; color: var(--muted); transition: transform 0.2s; }
+    .test-card.open .chevron { transform: rotate(180deg); }
+
+    /* Test body */
+    .test-body { display: none; padding: 0 20px 20px; border-top: 1px solid var(--border); }
+    .test-card.open .test-body { display: block; }
+
+    .test-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+    .test-section { }
+    .test-section-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); margin-bottom: 8px; }
+    .test-steps { list-style: none; padding: 0; margin: 0; }
+    .test-steps li { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: #ccc; line-height: 1.5; margin-bottom: 8px; }
+    .step-num { width: 20px; height: 20px; border-radius: 50%; background: var(--surface2); border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: var(--muted); flex-shrink: 0; margin-top: 1px; }
+    .expected-box { background: rgba(34,197,94,0.05); border: 1px solid rgba(34,197,94,0.15); border-radius: 10px; padding: 12px 14px; font-size: 13px; color: #ccc; line-height: 1.6; }
+    .expected-box .check { color: var(--green); margin-right: 6px; }
+
+    .preconditions { background: var(--surface2); border: 1px solid var(--border2); border-radius: 10px; padding: 12px 14px; margin-top: 12px; }
+    .preconditions-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); margin-bottom: 6px; }
+    .preconditions-text { font-size: 13px; color: #aaa; line-height: 1.5; }
+
+    .notes-box { background: rgba(96,165,250,0.05); border: 1px solid rgba(96,165,250,0.15); border-radius: 10px; padding: 12px 14px; margin-top: 12px; font-size: 13px; color: #aaa; line-height: 1.6; }
+    .notes-label { font-size: 11px; font-weight: 700; color: #60a5fa; margin-bottom:4px; }
+
+    .fail-notes { width: 100%; background: rgba(248,113,113,0.05); border: 1px solid rgba(248,113,113,0.2); border-radius: 8px; padding: 10px 12px; color: #f87171; font-size: 13px; margin-top: 12px; resize: vertical; min-height: 60px; outline: none; }
+    .fail-notes::placeholder { color: rgba(248,113,113,0.4); }
+    .fail-notes-label { font-size: 11px; font-weight: 700; color: #f87171; margin-bottom: 5px; margin-top: 12px; display: none; }
+    .test-card.fail .fail-notes-label { display: block; }
+    .test-card.fail .fail-notes { display: block; }
+    .fail-notes { display: none; }
+
+    /* Action row */
+    .action-row { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+    .action-btn { display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; padding: 7px 14px; border-radius: 8px; border: 1.5px solid var(--border2); background: transparent; color: var(--muted); cursor: pointer; transition: all 0.15s; }
+    .action-btn:hover { border-color: var(--orange); color: var(--orange); }
+    .action-btn.pass-btn:hover { border-color: var(--green); color: var(--green); }
+    .action-btn.fail-btn:hover { border-color: var(--red); color: #f87171; }
+    .action-btn.skip-btn:hover { border-color: var(--blue); color: var(--blue); }
+
+    /* Summary bar */
+    .summary-bar { position: fixed; bottom: 0; left: 260px; right: 0; background: rgba(8,8,8,0.95); backdrop-filter: blur(20px); border-top: 1px solid var(--border2); padding: 12px 32px; display: flex; align-items: center; justify-content: space-between; z-index: 40; }
+    .summary-stats { display: flex; gap: 20px; }
+    .summary-stat { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; }
+    .summary-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .summary-actions { display: flex; gap: 8px; }
+    .summary-btn { font-size: 12px; font-weight: 600; padding: 8px 16px; border-radius: 8px; cursor: pointer; border: none; transition: all 0.2s; }
+    .btn-reset { background: var(--surface2); color: var(--muted); border: 1px solid var(--border2); }
+    .btn-reset:hover { border-color: var(--orange); color: var(--orange); }
+    .btn-export { background: linear-gradient(135deg, var(--orange), var(--red)); color: white; box-shadow: 0 3px 12px rgba(249,115,22,0.25); }
+    .btn-export:hover { box-shadow: 0 5px 20px rgba(249,115,22,0.4); transform: translateY(-1px); }
+
+    /* Page sections */
+    .section { display: none; }
+    .section.active { display: block; }
+
+    /* Divider */
+    .divider { height: 1px; background: var(--border); margin: 24px 0; }
+
+    /* Stats overview */
+    .overview-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 28px; }
+    .overview-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
+    .overview-num { font-size: 32px; font-weight: 900; letter-spacing: -1px; line-height: 1; }
+    .overview-label { font-size: 12px; color: var(--muted); margin-top: 5px; }
+
+    .fade-in { animation: fadeIn 0.25s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-left">
+    <div class="logo-icon">🩺</div>
+    <div>
+      <div class="header-title">AutoDoctor AI — Test Suite</div>
+      <div class="header-sub">User Acceptance Testing · v1.0 · March 2026</div>
+    </div>
+  </div>
+  <div class="header-meta">
+    <div class="meta-pill">Tester: <span id="tester-name">—</span></div>
+    <div class="meta-pill">Progress: <span id="progress-pct">0%</span></div>
+    <div class="meta-pill">Date: <span>Mar 12, 2026</span></div>
+  </div>
+</div>
+<div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+
+<div class="layout">
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Test Suites</div>
+      <div class="sidebar-item active" id="nav-overview" onclick="showSection('overview')">📊 Overview</div>
+      <div class="sidebar-item" id="nav-tc-diag" onclick="showSection('tc-diag')">⚡ Diagnose Flow <span class="sidebar-count">8</span></div>
+      <div class="sidebar-item" id="nav-tc-docs" onclick="showSection('tc-docs')">📎 Documents <span class="sidebar-count">5</span></div>
+      <div class="sidebar-item" id="nav-tc-records" onclick="showSection('tc-records')">📋 Records <span class="sidebar-count">5</span></div>
+      <div class="sidebar-item" id="nav-tc-vehicles" onclick="showSection('tc-vehicles')">🚗 Vehicles <span class="sidebar-count">5</span></div>
+      <div class="sidebar-item" id="nav-tc-edge" onclick="showSection('tc-edge')">⚠️ Edge Cases <span class="sidebar-count">5</span></div>
+    </div>
+    <div class="sidebar-stats">
+      <div class="sidebar-stat-row"><span class="sidebar-stat-label">Total Cases</span><span class="sidebar-stat-val" id="s-total">28</span></div>
+      <div class="sidebar-stat-row"><span class="sidebar-stat-label">✅ Passed</span><span class="sidebar-stat-val" style="color:var(--green)" id="s-pass">0</span></div>
+      <div class="sidebar-stat-row"><span class="sidebar-stat-label">❌ Failed</span><span class="sidebar-stat-val" style="color:#f87171" id="s-fail">0</span></div>
+      <div class="sidebar-stat-row"><span class="sidebar-stat-label">⏭ Skipped</span><span class="sidebar-stat-val" style="color:#60a5fa" id="s-skip">0</span></div>
+      <div class="sidebar-stat-row"><span class="sidebar-stat-label">⏳ Pending</span><span class="sidebar-stat-val" style="color:var(--muted)" id="s-pending">28</span></div>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="main">
+
+    <!-- OVERVIEW -->
+    <div class="section active fade-in" id="section-overview">
+      <div class="suite-header">
+        <div class="suite-badge">📋 Test Plan</div>
+        <div class="suite-title">AutoDoctor AI — UAT Test Suite</div>
+        <div class="suite-desc">Full user acceptance test covering all 4 app modules. Run each test case, mark pass/fail, and add failure notes. Export the report when done.</div>
+      </div>
+
+      <div class="overview-grid">
+        <div class="overview-card"><div class="overview-num grad-text" id="ov-total" style="background:linear-gradient(135deg,#fb923c,#f87171);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">28</div><div class="overview-label">Total Test Cases</div></div>
+        <div class="overview-card"><div class="overview-num" style="color:var(--green);" id="ov-pass">0</div><div class="overview-label">Passed</div></div>
+        <div class="overview-card"><div class="overview-num" style="color:#f87171;" id="ov-fail">0</div><div class="overview-label">Failed</div></div>
+        <div class="overview-card"><div class="overview-num" style="color:var(--muted);" id="ov-pending">28</div><div class="overview-label">Pending</div></div>
+      </div>
+
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:20px;">
+        <table style="width:100%;border-collapse:collapse;font-size:13px;">
+          <thead>
+            <tr style="border-bottom:1px solid var(--border2);">
+              <th style="text-align:left;padding:12px 16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);">Suite</th>
+              <th style="text-align:left;padding:12px 16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);">Cases</th>
+              <th style="text-align:left;padding:12px 16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);">Status</th>
+              <th style="text-align:left;padding:12px 16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);">Priority</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom:1px solid var(--border);cursor:pointer;" onclick="showSection('tc-diag')">
+              <td style="padding:14px 16px;font-weight:600;">⚡ Diagnose Flow</td>
+              <td style="padding:14px 16px;color:var(--muted);">8 cases</td>
+              <td style="padding:14px 16px;" id="suite-status-diag"><span style="color:var(--muted);">Pending</span></td>
+              <td style="padding:14px 16px;"><span class="priority-badge p-critical">Critical</span></td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);cursor:pointer;" onclick="showSection('tc-docs')">
+              <td style="padding:14px 16px;font-weight:600;">📎 Documents</td>
+              <td style="padding:14px 16px;color:var(--muted);">5 cases</td>
+              <td style="padding:14px 16px;" id="suite-status-docs"><span style="color:var(--muted);">Pending</span></td>
+              <td style="padding:14px 16px;"><span class="priority-badge p-high">High</span></td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);cursor:pointer;" onclick="showSection('tc-records')">
+              <td style="padding:14px 16px;font-weight:600;">📋 Records</td>
+              <td style="padding:14px 16px;color:var(--muted);">5 cases</td>
+              <td style="padding:14px 16px;" id="suite-status-records"><span style="color:var(--muted);">Pending</span></td>
+              <td style="padding:14px 16px;"><span class="priority-badge p-high">High</span></td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);cursor:pointer;" onclick="showSection('tc-vehicles')">
+              <td style="padding:14px 16px;font-weight:600;">🚗 Vehicles</td>
+              <td style="padding:14px 16px;color:var(--muted);">5 cases</td>
+              <td style="padding:14px 16px;" id="suite-status-vehicles"><span style="color:var(--muted);">Pending</span></td>
+              <td style="padding:14px 16px;"><span class="priority-badge p-medium">Medium</span></td>
+            </tr>
+            <tr style="cursor:pointer;" onclick="showSection('tc-edge')">
+              <td style="padding:14px 16px;font-weight:600;">⚠️ Edge Cases</td>
+              <td style="padding:14px 16px;color:var(--muted);">5 cases</td>
+              <td style="padding:14px 16px;" id="suite-status-edge"><span style="color:var(--muted);">Pending</span></td>
+              <td style="padding:14px 16px;"><span class="priority-badge p-medium">Medium</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;">
+        <div style="font-size:13px;font-weight:700;margin-bottom:12px;">Tester Info</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div>
+            <label style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Your Name</label>
+            <input id="tester-input" class="input-field" placeholder="Enter your name" style="width:100%;background:var(--surface2);border:1.5px solid var(--border2);border-radius:10px;color:var(--text);padding:10px 14px;font-size:14px;outline:none;" oninput="document.getElementById('tester-name').textContent=this.value||'—'"/>
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">App URL</label>
+            <input id="app-url" class="input-field" placeholder="Paste AutoDoctor AI URL" style="width:100%;background:var(--surface2);border:1.5px solid var(--border2);border-radius:10px;color:var(--text);padding:10px 14px;font-size:14px;outline:none;"/>
+          </div>
+        </div>
+        <button onclick="showSection('tc-diag')" style="margin-top:16px;background:linear-gradient(135deg,var(--orange),var(--red));color:white;border:none;border-radius:10px;padding:11px 22px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(249,115,22,0.25);">Start Testing →</button>
+      </div>
+    </div>
+
+    <!-- DIAGNOSE -->
+    <div class="section fade-in" id="section-tc-diag">
+      <div class="suite-header">
+        <div class="suite-badge">⚡ Suite 1</div>
+        <div class="suite-title">Diagnose Flow</div>
+        <div class="suite-desc">Tests the full 4-step diagnostic wizard — vehicle input, fault code entry, analysis loading, and results display.</div>
+      </div>
+      <div id="tests-diag"></div>
+    </div>
+
+    <!-- DOCS -->
+    <div class="section fade-in" id="section-tc-docs">
+      <div class="suite-header">
+        <div class="suite-badge">📎 Suite 2</div>
+        <div class="suite-title">Document Upload</div>
+        <div class="suite-desc">Tests the file upload zone, extraction simulation, and save-to-records functionality.</div>
+      </div>
+      <div id="tests-docs"></div>
+    </div>
+
+    <!-- RECORDS -->
+    <div class="section fade-in" id="section-tc-records">
+      <div class="suite-header">
+        <div class="suite-badge">📋 Suite 3</div>
+        <div class="suite-title">Records Tab</div>
+        <div class="suite-desc">Tests the diagnostic history table — data loading, stat cards, resolve action, and display accuracy.</div>
+      </div>
+      <div id="tests-records"></div>
+    </div>
+
+    <!-- VEHICLES -->
+    <div class="section fade-in" id="section-tc-vehicles">
+      <div class="suite-header">
+        <div class="suite-badge">🚗 Suite 4</div>
+        <div class="suite-title">Vehicles Tab</div>
+        <div class="suite-desc">Tests vehicle creation, display, validation, and deletion flows.</div>
+      </div>
+      <div id="tests-vehicles"></div>
+    </div>
+
+    <!-- EDGE CASES -->
+    <div class="section fade-in" id="section-tc-edge">
+      <div class="suite-header">
+        <div class="suite-badge">⚠️ Suite 5</div>
+        <div class="suite-title">Edge Cases & Validation</div>
+        <div class="suite-desc">Tests boundary conditions, invalid inputs, empty states, and error handling.</div>
+      </div>
+      <div id="tests-edge"></div>
+    </div>
+
+    <div style="height:80px;"></div>
+  </div>
+</div>
+
+<!-- Summary bar -->
+<div class="summary-bar">
+  <div class="summary-stats">
+    <div class="summary-stat"><div class="summary-dot" style="background:var(--green)"></div><span id="bar-pass">0 Passed</span></div>
+    <div class="summary-stat"><div class="summary-dot" style="background:#f87171"></div><span id="bar-fail">0 Failed</span></div>
+    <div class="summary-stat"><div class="summary-dot" style="background:#60a5fa"></div><span id="bar-skip">0 Skipped</span></div>
+    <div class="summary-stat"><div class="summary-dot" style="background:var(--muted)"></div><span id="bar-pending">28 Pending</span></div>
+  </div>
+  <div class="summary-actions">
+    <button class="summary-btn btn-reset" onclick="resetAll()">↺ Reset All</button>
+    <button class="summary-btn btn-export" onclick="exportReport()">⬇ Export Report</button>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════
+// TEST DATA
+// ══════════════════════════════
+const TESTS = {
+  diag: [
+    { id:'TC-D01', name:'Complete diagnostic wizard — happy path', priority:'critical',
+      pre:'App is open on the Diagnose tab.',
+      steps:['Enter: Year=2021, Make=Toyota, Model=Camry, Mileage=58000, Name=D, Location=Atlanta, GA','Click Continue →','Click the P0300 chip (Misfire)','Click ⚡ Run Diagnostic','Wait for the 3-step loading animation to complete','Review the results screen'],
+      expected:['Progress indicator advances through all 4 steps','Loading screen shows 3 sequential steps lighting up','Results show: code P0300, severity badge = High (orange)','Plain English explanation is displayed','Cost range shows $150 – $900','Recommended Action is displayed','3 nearby shops appear with distances and availability','Toast appears: "Report saved to records"']
+    },
+    { id:'TC-D02', name:'All 5 quick-pick fault codes produce results', priority:'critical',
+      pre:'Complete TC-D01 first. Click ← New Diagnosis to reset.',
+      steps:['Enter vehicle info, click Continue','Click each chip one at a time: P0300, P0420, P0171, P0128, B0001','For each: click Run Diagnostic and review the result'],
+      expected:['P0300 → Severity: High, Cost: $150–$900','P0420 → Severity: Medium, Cost: $400–$2,200','P0171 → Severity: Medium, Cost: $100–$600','P0128 → Severity: Low, Cost: $150–$400','B0001 → Severity: Critical, Cost: $200–$1,000','Each result has a unique Plain English explanation','Critical badge (B0001) shows red pulsing dot']
+    },
+    { id:'TC-D03', name:'Unknown fault code falls back gracefully', priority:'high',
+      pre:'App is on Step 2 (Fault Code entry).',
+      steps:['Type any unknown code: e.g. X9999','Click Run Diagnostic'],
+      expected:['App does NOT crash or show a blank screen','Generic fallback result is displayed','Severity shows as Medium','Cost estimate is shown ($75–$500)','Recommended action advises scheduling a diagnostic appointment']
+    },
+    { id:'TC-D04', name:'Shop selection triggers booking form', priority:'high',
+      pre:'Complete a diagnosis and reach the results screen.',
+      steps:['Click on any of the 3 shop cards','Observe the card selection state','Observe the booking section below'],
+      expected:['Selected shop card gets an orange border highlight','Booking form slides in below shops','Shop name and address appear in the booking pill','Date field defaults to today\'s date','Time dropdown shows available slots']
+    },
+    { id:'TC-D05', name:'Confirm appointment flow completes', priority:'high',
+      pre:'A shop is selected and booking form is visible.',
+      steps:['Select a date (today or future)','Select a time from the dropdown','Click ✓ Confirm Appointment'],
+      expected:['Booking form disappears','Green confirmation box appears with ✅ icon','Appointment details shown: vehicle, code, shop, date, time','"The shop has been notified" message displayed','Toast: "Appointment saved!"']
+    },
+    { id:'TC-D06', name:'Step indicator updates correctly', priority:'medium',
+      pre:'App is on Step 1.',
+      steps:['Observe step 1 circle (active = orange)','Click Continue → to step 2','Observe indicators','Click Run Diagnostic to step 3','Observe indicators','Wait for results (step 4)','Observe indicators'],
+      expected:['Step 1 active = orange ring','After Continue: Step 1 turns green ✓, Step 2 = orange','After Run Diagnostic: Steps 1–2 green, Step 3 = orange','After results: Steps 1–3 green ✓, Step 4 = orange','Connecting lines between completed steps turn green']
+    },
+    { id:'TC-D07', name:'← New Diagnosis resets the wizard', priority:'medium',
+      pre:'A diagnosis has been completed and results are showing.',
+      steps:['Click ← New Diagnosis button at the bottom','Observe the state of the form'],
+      expected:['Wizard returns to Step 1','All input fields are blank','Step indicator resets to Step 1 active','Previous results are no longer visible']
+    },
+    { id:'TC-D08', name:'Cost bar animates on results load', priority:'low',
+      pre:'None.',
+      steps:['Run any diagnostic','Watch the cost section when results appear'],
+      expected:['Cost bar starts at 0% width','Animates to the appropriate fill level (proportional to cost range)','Animation takes ~0.9 seconds with smooth easing','Higher cost codes fill the bar more (B0001/P0420 near full, P0128 partial)']
+    }
+  ],
+  docs: [
+    { id:'TC-U01', name:'Upload a file via click-to-browse', priority:'high',
+      pre:'App is on the Documents tab.',
+      steps:['Click anywhere on the upload zone','A file picker dialog should open','Select any file (PDF, image, or text)','Click Open'],
+      expected:['File picker opens on click','File appears in the file list immediately','File shows name, size, and file type','Status badge shows "Processing…" (yellow)','After ~1.5 seconds, status changes to "Analyzed ✓" (green)','Extracted Information panel appears below']
+    },
+    { id:'TC-U02', name:'Drag and drop file upload', priority:'high',
+      pre:'App is on the Documents tab.',
+      steps:['Drag a file from your desktop over the upload zone','Observe the zone\'s visual state while hovering','Drop the file'],
+      expected:['Upload zone border turns orange while hovering','Background gets a subtle orange tint on hover','File processes identically to click-upload','Extracted panel appears after processing']
+    },
+    { id:'TC-U03', name:'Inspection report extraction', priority:'high',
+      pre:'App is on the Documents tab.',
+      steps:['Upload any file with "inspection" or "report" in the filename (e.g. inspection_report.pdf)','Wait for processing to complete','Review the Extracted Information panel'],
+      expected:['Document Type shows: Inspection Report','Fault Codes shows: P0420, P0171 badges','Mileage: 68,420','Date: 2025-11-14','Shop: Midas Auto','Cost: $180','Notes mention catalytic converter and MAF sensor']
+    },
+    { id:'TC-U04', name:'Invoice/receipt extraction', priority:'medium',
+      pre:'App is on the Documents tab.',
+      steps:['Upload a file with "invoice" or "receipt" in the filename','Wait for processing','Review extraction panel'],
+      expected:['Document Type shows: Service Invoice','Fault Codes: None detected','Mileage: 65,100','Date: 2025-08-22','Shop: Jiffy Lube','Cost: $94.99','Notes mention oil change, tire rotation, air filter']
+    },
+    { id:'TC-U05', name:'Save extracted data to records', priority:'medium',
+      pre:'A file has been uploaded and the Extracted Information panel is visible.',
+      steps:['Click 💾 Save to Records button','Observe the result'],
+      expected:['Toast appears: "Extracted data saved to records!"','Extracted Information panel disappears','No crash or error']
+    }
+  ],
+  records: [
+    { id:'TC-R01', name:'Records tab loads live data', priority:'critical',
+      pre:'App has been used to run at least one diagnosis.',
+      steps:['Click the 📋 Records tab','Wait for data to load'],
+      expected:['Loading spinner appears briefly','Table populates with diagnostic reports','Each row shows: fault code, description, severity badge, cost range, status badge, location','Stat cards at top show correct totals for Total, Open, and Resolved']
+    },
+    { id:'TC-R02', name:'Severity badges display correct colors', priority:'high',
+      pre:'Records tab is loaded with data.',
+      steps:['Review the Severity column in the table','Check each badge color against the expected mapping'],
+      expected:['Low → green badge','Medium → yellow badge','High → orange badge','Critical → red badge','Colors match the same badges in the diagnosis results']
+    },
+    { id:'TC-R03', name:'Status badges display correctly', priority:'high',
+      pre:'Records tab is loaded with data including Open, Scheduled, and Resolved records.',
+      steps:['Review the Status column','Check badge colors'],
+      expected:['Open → orange badge','Scheduled → blue badge','Resolved → green badge','Resolved records do NOT show the ✓ Resolve button']
+    },
+    { id:'TC-R04', name:'Resolve button updates record status', priority:'critical',
+      pre:'At least one record with status "Open" exists in the table.',
+      steps:['Find an Open record','Click the ✓ Resolve button on that row','Observe the result'],
+      expected:['Toast appears: "Marked as resolved"','Table refreshes automatically','The record\'s status badge changes from orange "Open" to green "Resolved"','The ✓ Resolve button disappears from that row','Resolved count in stat cards increases by 1','Open count decreases by 1']
+    },
+    { id:'TC-R05', name:'Refresh button reloads data', priority:'medium',
+      pre:'Records tab is loaded.',
+      steps:['Click the ↻ Refresh button','Observe the table'],
+      expected:['Loading state appears briefly','Table reloads with current data','Stat cards update','No duplicate records appear']
+    }
+  ],
+  vehicles: [
+    { id:'TC-V01', name:'Vehicles tab loads saved vehicles', priority:'critical',
+      pre:'App has at least one saved vehicle.',
+      steps:['Click the 🚗 Vehicles tab','Wait for data to load'],
+      expected:['Loading spinner appears briefly','Vehicle cards display with year, make, model','Owner name and mileage shown','VIN displayed if available','Email shown if available']
+    },
+    { id:'TC-V02', name:'Add a new vehicle — full details', priority:'critical',
+      pre:'App is on the Vehicles tab.',
+      steps:['Fill in: Year=2022, Make=Chevrolet, Model=Silverado, Trim=LTZ, Mileage=31000','Fill in: Owner=Test User, Email=test@email.com, VIN=1GCUYDED0NZ123456','Click + Add Vehicle'],
+      expected:['Toast appears: "2022 Chevrolet Silverado added!"','All input fields clear automatically','Vehicle list refreshes','New vehicle card appears with all entered details','VIN and email are visible on the card']
+    },
+    { id:'TC-V03', name:'Add vehicle — minimum required fields', priority:'high',
+      pre:'App is on the Vehicles tab.',
+      steps:['Fill in ONLY: Year=2018, Make=Honda, Model=Accord','Leave all other fields blank','Click + Add Vehicle'],
+      expected:['Vehicle saves successfully','Toast: "2018 Honda Accord added!"','Card shows "No owner" and "Mileage unknown" for blank fields','No crash or validation error for optional fields']
+    },
+    { id:'TC-V04', name:'Delete a vehicle', priority:'high',
+      pre:'At least one vehicle exists in the list.',
+      steps:['Find any vehicle card','Click the 🗑 trash icon','Observe the confirmation dialog','Click OK to confirm'],
+      expected:['Browser confirm dialog appears: "Remove this vehicle?"','After confirming: Toast "Vehicle removed"','Vehicle card disappears from the list','List count decreases by 1','Canceling the dialog leaves the vehicle in place']
+    },
+    { id:'TC-V05', name:'Empty vehicles state', priority:'low',
+      pre:'No vehicles saved, or all have been deleted.',
+      steps:['Navigate to the Vehicles tab'],
+      expected:['Empty state shows 🚗 icon','Message: "No vehicles yet"','Sub-text: "Add your first vehicle above"','Add vehicle form is still fully accessible']
+    }
+  ],
+  edge: [
+    { id:'TC-E01', name:'Diagnose — missing required fields', priority:'critical',
+      pre:'App is on Step 1 (Vehicle Info).',
+      steps:['Leave Year, Make, Model, or Location blank','Click Continue →'],
+      expected:['App does NOT proceed to Step 2','Toast warning appears: "Fill in Year, Make, Model and Location"','Form stays on Step 1','No crash or blank screen']
+    },
+    { id:'TC-E02', name:'Diagnose — fault code too short', priority:'high',
+      pre:'App is on Step 2 (Fault Code entry).',
+      steps:['Type only 1-3 characters in the fault code field (e.g. "P0")','Click ⚡ Run Diagnostic'],
+      expected:['App does NOT proceed to Step 3','Toast warning: "Enter a valid fault code (e.g. P0300)"','Form stays on Step 2']
+    },
+    { id:'TC-E03', name:'Add vehicle — missing required fields', priority:'high',
+      pre:'App is on the Vehicles tab.',
+      steps:['Leave Year blank, fill in Make and Model','Click + Add Vehicle','Then try leaving Make blank with Year and Model filled'],
+      expected:['Toast warning: "Year, Make, Model required"','Vehicle is NOT saved','Form fields retain their values (not cleared on failed submit)']
+    },
+    { id:'TC-E04', name:'Book appointment without selecting a date', priority:'medium',
+      pre:'A diagnosis is complete, a shop is selected, booking form is visible.',
+      steps:['Clear the date field','Click ✓ Confirm Appointment'],
+      expected:['Toast warning: "Pick a date first"','Appointment is NOT saved','Booking form remains visible']
+    },
+    { id:'TC-E05', name:'Multiple file uploads', priority:'medium',
+      pre:'App is on the Documents tab.',
+      steps:['Upload 3 files in rapid succession (click upload multiple times or select multiple)','Observe processing'],
+      expected:['Each file gets its own item in the file list','Each processes independently','No files overwrite each other','Extracted panel shows the last processed file\'s data','No crash or freezing']
+    }
+  ]
+};
+
+// ══════════════════════════════
+// STATE
+// ══════════════════════════════
+const state = {};
+
+// ══════════════════════════════
+// RENDER
+// ══════════════════════════════
+function renderTests(containerId, tests) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = tests.map(t => buildCard(t)).join('');
+}
+
+function buildCard(t) {
+  const pClass = { critical:'p-critical', high:'p-high', medium:'p-medium', low:'p-low' }[t.priority];
+  const pLabel = t.priority.charAt(0).toUpperCase() + t.priority.slice(1);
+  const stepsHtml = t.steps.map((s,i) => `<li><div class="step-num">${i+1}</div><span>${s}</span></li>`).join('');
+  const expectedHtml = t.expected.map(e => `<div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:6px;font-size:13px;color:#ccc;line-height:1.5;"><span style="color:var(--green);flex-shrink:0;">✓</span><span>${e}</span></div>`).join('');
+
+  return `
+  <div class="test-card pending" id="card-${t.id}" onclick="toggleCard('${t.id}', event)">
+    <div class="test-header">
+      <div class="test-header-left">
+        <div class="test-id">${t.id}</div>
+        <div class="test-name">${t.name}</div>
+      </div>
+      <div class="test-header-right">
+        <span class="priority-badge ${pClass}">${pLabel}</span>
+        <button class="status-btn pending" id="sbtn-${t.id}" onclick="cycleStatus('${t.id}', event)">⏳ Pending</button>
+        <span class="chevron">▼</span>
+      </div>
+    </div>
+    <div class="test-body">
+      <div class="preconditions">
+        <div class="preconditions-label">Preconditions</div>
+        <div class="preconditions-text">${t.pre}</div>
+      </div>
+      <div class="test-grid">
+        <div class="test-section">
+          <div class="test-section-label">Test Steps</div>
+          <ul class="test-steps">${stepsHtml}</ul>
+        </div>
+        <div class="test-section">
+          <div class="test-section-label">Expected Results</div>
+          <div class="expected-box">${expectedHtml}</div>
+        </div>
+      </div>
+      <div class="fail-notes-label">❌ Failure Notes</div>
+      <textarea class="fail-notes" id="notes-${t.id}" placeholder="Describe what went wrong, what you saw, and steps to reproduce…" onclick="event.stopPropagation()"></textarea>
+      <div class="action-row">
+        <button class="action-btn pass-btn" onclick="setStatus('${t.id}','pass',event)">✅ Pass</button>
+        <button class="action-btn fail-btn" onclick="setStatus('${t.id}','fail',event)">❌ Fail</button>
+        <button class="action-btn skip-btn" onclick="setStatus('${t.id}','skip',event)">⏭ Skip</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ══════════════════════════════
+// INTERACTIONS
+// ══════════════════════════════
+function toggleCard(id, event) {
+  if (event.target.closest('button') || event.target.closest('textarea')) return;
+  const card = document.getElementById('card-'+id);
+  card.classList.toggle('open');
+}
+
+function cycleStatus(id, event) {
+  event.stopPropagation();
+  const order = ['pending','pass','fail','skip'];
+  const cur = state[id] || 'pending';
+  const next = order[(order.indexOf(cur)+1) % order.length];
+  setStatus(id, next, event);
+}
+
+function setStatus(id, status, event) {
+  if(event) event.stopPropagation();
+  state[id] = status;
+  const card = document.getElementById('card-'+id);
+  const btn = document.getElementById('sbtn-'+id);
+  card.className = card.className.replace(/\b(pending|pass|fail|skip)\b/g, '') + ' ' + status;
+  const labels = { pending:'⏳ Pending', pass:'✅ Pass', fail:'❌ Fail', skip:'⏭ Skip' };
+  btn.textContent = labels[status];
+  btn.className = 'status-btn ' + status;
+  updateStats();
+}
+
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
+  document.getElementById('section-'+id).classList.add('active');
+  document.getElementById('nav-'+id).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function updateStats() {
+  const all = Object.values(state);
+  const total = 28;
+  const pass = all.filter(s=>s==='pass').length;
+  const fail = all.filter(s=>s==='fail').length;
+  const skip = all.filter(s=>s==='skip').length;
+  const pending = total - pass - fail - skip;
+  const pct = Math.round(((pass+fail+skip)/total)*100);
+
+  ['s-pass','ov-pass','bar-pass'].forEach(id => { const e=document.getElementById(id); if(e) e.textContent=id.includes('bar')?pass+' Passed':pass; });
+  ['s-fail','ov-fail','bar-fail'].forEach(id => { const e=document.getElementById(id); if(e) e.textContent=id.includes('bar')?fail+' Failed':fail; });
+  ['s-skip','bar-skip'].forEach(id => { const e=document.getElementById(id); if(e) e.textContent=id.includes('bar')?skip+' Skipped':skip; });
+  ['s-pending','ov-pending','bar-pending'].forEach(id => { const e=document.getElementById(id); if(e) e.textContent=id.includes('bar')?pending+' Pending':pending; });
+
+  document.getElementById('progress-pct').textContent = pct+'%';
+  document.getElementById('progress-fill').style.width = pct+'%';
+}
+
+function resetAll() {
+  if(!confirm('Reset all test results?')) return;
+  Object.keys(state).forEach(k => delete state[k]);
+  document.querySelectorAll('.test-card').forEach(c => {
+    c.className = c.className.replace(/\b(pass|fail|skip)\b/g,'pending');
+  });
+  document.querySelectorAll('.status-btn').forEach(b => { b.textContent='⏳ Pending'; b.className='status-btn pending'; });
+  document.querySelectorAll('.fail-notes').forEach(t => t.value='');
+  updateStats();
+}
+
+function exportReport() {
+  const tester = document.getElementById('tester-input')?.value || 'Unknown';
+  const url = document.getElementById('app-url')?.value || 'Not provided';
+  const all = Object.values(state);
+  const total = 28;
+  const pass = all.filter(s=>s==='pass').length;
+  const fail = all.filter(s=>s==='fail').length;
+  const skip = all.filter(s=>s==='skip').length;
+  const pending = total - pass - fail - skip;
+
+  let report = `AUTODOCTOR AI — UAT TEST REPORT\n`;
+  report += `${'='.repeat(50)}\n`;
+  report += `Date: ${new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}\n`;
+  report += `Tester: ${tester}\n`;
+  report += `App URL: ${url}\n`;
+  report += `\nSUMMARY\n${'-'.repeat(30)}\n`;
+  report += `Total Cases:  ${total}\n`;
+  report += `Passed:       ${pass} (${Math.round((pass/total)*100)}%)\n`;
+  report += `Failed:       ${fail} (${Math.round((fail/total)*100)}%)\n`;
+  report += `Skipped:      ${skip}\n`;
+  report += `Pending:      ${pending}\n`;
+
+  const suites = [
+    { name:'Diagnose Flow', tests: TESTS.diag },
+    { name:'Documents', tests: TESTS.docs },
+    { name:'Records', tests: TESTS.records },
+    { name:'Vehicles', tests: TESTS.vehicles },
+    { name:'Edge Cases', tests: TESTS.edge }
+  ];
+
+  suites.forEach(suite => {
+    report += `\n\n${suite.name.toUpperCase()}\n${'─'.repeat(40)}\n`;
+    suite.tests.forEach(t => {
+      const s = state[t.id] || 'pending';
+      const icon = {pass:'✅',fail:'❌',skip:'⏭',pending:'⏳'}[s];
+      report += `\n${icon} [${t.id}] ${t.name}\n`;
+      report += `   Priority: ${t.priority.toUpperCase()} | Status: ${s.toUpperCase()}\n`;
+      const notes = document.getElementById('notes-'+t.id)?.value;
+      if (notes) report += `   Failure Notes: ${notes}\n`;
+    });
+  });
+
+  report += `\n\n${'='.repeat(50)}\nEnd of Report\n`;
+
+  const blob = new Blob([report], {type:'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `AutoDoctor_UAT_Report_${new Date().toISOString().split('T')[0]}.txt`;
+  a.click();
+}
+
+// Init
+renderTests('tests-diag', TESTS.diag);
+renderTests('tests-docs', TESTS.docs);
+renderTests('tests-records', TESTS.records);
+renderTests('tests-vehicles', TESTS.vehicles);
+renderTests('tests-edge', TESTS.edge);
+updateStats();
+</script>
+</body>
+</html>
