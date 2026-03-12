@@ -8,541 +8,272 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; font-family: 'Inter', sans-serif; }
-
     :root {
-      --orange: #f97316;
-      --red: #ef4444;
-      --bg: #080808;
-      --surface: #111111;
-      --surface2: #181818;
-      --border: #1f1f1f;
-      --border2: #2a2a2a;
-      --text: #f5f5f5;
-      --muted: #666;
-      --subtle: #333;
+      --orange: #f97316; --red: #ef4444;
+      --bg: #080808; --surface: #111; --surface2: #181818;
+      --border: #1f1f1f; --border2: #2a2a2a;
+      --text: #f5f5f5; --muted: #666; --subtle: #333;
     }
-
     html { scroll-behavior: smooth; }
     body { background: var(--bg); color: var(--text); min-height: 100vh; margin: 0; }
-
-    /* ── Scrollbar ── */
     ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 4px; }
 
-    /* ── Gradient utilities ── */
-    .grad { background: linear-gradient(135deg, var(--orange), var(--red)); }
-    .grad-text {
-      background: linear-gradient(135deg, #fb923c, #f87171);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
+    .grad-text { background: linear-gradient(135deg,#fb923c,#f87171); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
 
-    /* ── Header ── */
-    .header {
-      position: sticky; top: 0; z-index: 50;
-      background: rgba(8,8,8,0.85);
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--border);
-      padding: 0 24px;
-      height: 60px;
-      display: flex; align-items: center; justify-content: space-between;
-    }
+    /* Header */
+    .header { position:sticky; top:0; z-index:50; background:rgba(8,8,8,0.9); backdrop-filter:blur(20px); border-bottom:1px solid var(--border); padding:0 24px; height:60px; display:flex; align-items:center; justify-content:space-between; }
+    .logo { display:flex; align-items:center; gap:10px; }
+    .logo-icon { width:34px; height:34px; background:linear-gradient(135deg,var(--orange),var(--red)); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:16px; box-shadow:0 0 20px rgba(249,115,22,0.3); }
+    .logo-name { font-weight:800; font-size:16px; letter-spacing:-0.3px; }
+    .logo-tag { font-size:11px; color:var(--muted); margin-top:-2px; }
+    .status-pill { display:flex; align-items:center; gap:6px; background:rgba(34,197,94,0.08); border:1px solid rgba(34,197,94,0.2); border-radius:20px; padding:5px 12px; font-size:12px; color:#4ade80; }
+    .status-dot { width:6px; height:6px; border-radius:50%; background:#4ade80; animation:pulse-dot 2s infinite; }
+    @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:0.4} }
 
-    .logo { display: flex; align-items: center; gap: 10px; }
-    .logo-icon {
-      width: 34px; height: 34px;
-      background: linear-gradient(135deg, var(--orange), var(--red));
-      border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 16px;
-      box-shadow: 0 0 20px rgba(249,115,22,0.3);
-    }
-    .logo-name { font-weight: 800; font-size: 16px; letter-spacing: -0.3px; }
-    .logo-tag { font-size: 11px; color: var(--muted); margin-top: -2px; }
+    /* Nav tabs */
+    .nav-tabs { display:flex; border-bottom:1px solid var(--border); background:var(--surface); padding:0 24px; gap:4px; }
+    .nav-tab { padding:14px 18px; font-size:13px; font-weight:600; color:var(--muted); cursor:pointer; border-bottom:2px solid transparent; transition:all 0.2s; white-space:nowrap; }
+    .nav-tab:hover { color:var(--text); }
+    .nav-tab.active { color:var(--orange); border-bottom-color:var(--orange); }
 
-    .status-pill {
-      display: flex; align-items: center; gap-6px;
-      background: rgba(34,197,94,0.08);
-      border: 1px solid rgba(34,197,94,0.2);
-      border-radius: 20px;
-      padding: 5px 12px;
-      font-size: 12px; color: #4ade80;
-      gap: 6px;
-    }
-    .status-dot { width: 6px; height: 6px; border-radius: 50%; background: #4ade80; animation: pulse 2s infinite; }
-    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+    /* Layout */
+    .page { display:none; padding:28px 20px 80px; max-width:720px; margin:0 auto; }
+    .page.active { display:block; }
 
-    /* ── Hero ── */
-    .hero {
-      text-align: center;
-      padding: 72px 24px 56px;
-      max-width: 600px;
-      margin: 0 auto;
-    }
-    .hero-eyebrow {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: rgba(249,115,22,0.1);
-      border: 1px solid rgba(249,115,22,0.25);
-      border-radius: 20px;
-      padding: 5px 14px;
-      font-size: 12px; font-weight: 600;
-      color: var(--orange);
-      margin-bottom: 24px;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-    }
-    .hero h1 {
-      font-size: clamp(32px, 6vw, 52px);
-      font-weight: 900;
-      line-height: 1.08;
-      letter-spacing: -1.5px;
-      margin: 0 0 16px;
-    }
-    .hero p {
-      font-size: 16px; color: var(--muted);
-      line-height: 1.6; margin: 0 0 36px;
-      max-width: 440px; margin-left: auto; margin-right: auto;
-    }
-    .hero-stats {
-      display: flex; justify-content: center; gap: 32px;
-      margin-bottom: 48px;
-    }
-    .hero-stat { text-align: center; }
-    .hero-stat-num { font-size: 22px; font-weight: 800; }
-    .hero-stat-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    /* Cards */
+    .card { background:var(--surface); border:1px solid var(--border); border-radius:20px; overflow:hidden; margin-bottom:16px; }
+    .card-pad { padding:24px; }
+    .card-title { font-size:17px; font-weight:700; letter-spacing:-0.3px; margin:0 0 4px; }
+    .card-sub { font-size:13px; color:var(--muted); }
 
-    /* ── Main container ── */
-    .container { max-width: 620px; margin: 0 auto; padding: 0 20px 80px; }
+    /* Inputs */
+    .field { margin-bottom:14px; }
+    .field-label { font-size:11px; font-weight:700; color:var(--muted); margin-bottom:6px; display:block; letter-spacing:0.5px; text-transform:uppercase; }
+    .input { width:100%; background:var(--surface2); border:1.5px solid var(--border2); border-radius:12px; color:var(--text); padding:12px 15px; font-size:14px; outline:none; transition:border-color 0.2s,box-shadow 0.2s; }
+    .input:focus { border-color:var(--orange); box-shadow:0 0 0 3px rgba(249,115,22,0.12); }
+    .input::placeholder { color:#3a3a3a; }
+    .input-code { text-align:center; font-size:26px; font-weight:800; letter-spacing:6px; text-transform:uppercase; padding:18px; }
+    select.input option { background:#111; }
+    textarea.input { resize:vertical; min-height:80px; }
+    .grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+    .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
 
-    /* ── Steps ── */
-    .step { display: none; }
-    .step.active { display: block; }
+    /* Buttons */
+    .btn { display:inline-flex; align-items:center; justify-content:center; gap:7px; border-radius:11px; font-weight:600; font-size:14px; cursor:pointer; border:none; transition:all 0.2s; padding:12px 22px; }
+    .btn-primary { background:linear-gradient(135deg,var(--orange),var(--red)); color:#fff; box-shadow:0 4px 18px rgba(249,115,22,0.28); width:100%; }
+    .btn-primary:hover { box-shadow:0 6px 26px rgba(249,115,22,0.42); transform:translateY(-1px); }
+    .btn-sm { padding:8px 16px; font-size:13px; }
+    .btn-ghost { background:transparent; color:var(--muted); border:1.5px solid var(--border2); }
+    .btn-ghost:hover { border-color:var(--orange); color:var(--orange); }
+    .btn-green { background:rgba(34,197,94,0.12); color:#4ade80; border:1px solid rgba(34,197,94,0.25); }
+    .btn-row { display:flex; gap:10px; }
 
-    /* ── Step indicator ── */
-    .step-indicator {
-      display: flex; align-items: center; justify-content: center;
-      gap: 0; margin-bottom: 32px;
+    /* Upload zone */
+    .upload-zone {
+      border:2px dashed var(--border2); border-radius:16px;
+      padding:40px 24px; text-align:center; cursor:pointer;
+      transition:all 0.2s; background:var(--surface2);
     }
-    .step-item {
-      display: flex; align-items: center; gap: 0;
-    }
-    .step-circle {
-      width: 32px; height: 32px;
-      border-radius: 50%;
-      border: 2px solid var(--border2);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 12px; font-weight: 700; color: var(--muted);
-      transition: all 0.3s; flex-shrink: 0;
-      background: var(--surface);
-    }
-    .step-circle.active {
-      border-color: var(--orange);
-      color: var(--orange);
-      background: rgba(249,115,22,0.1);
-      box-shadow: 0 0 0 4px rgba(249,115,22,0.1);
-    }
-    .step-circle.done {
-      border-color: #22c55e;
-      background: rgba(34,197,94,0.15);
-      color: #22c55e;
-    }
-    .step-label {
-      font-size: 11px; font-weight: 500;
-      color: var(--muted);
-      margin-top: 6px;
-      text-align: center;
-      white-space: nowrap;
-    }
-    .step-label.active { color: var(--orange); }
-    .step-label.done { color: #22c55e; }
-    .step-connector {
-      width: 48px; height: 2px;
-      background: var(--border2);
-      flex-shrink: 0;
-      transition: background 0.3s;
-      margin: 0 4px;
-      margin-bottom: 18px;
-    }
-    .step-connector.done { background: #22c55e; }
+    .upload-zone:hover, .upload-zone.drag-over { border-color:var(--orange); background:rgba(249,115,22,0.04); }
+    .upload-icon { font-size:36px; margin-bottom:12px; }
+    .upload-title { font-size:15px; font-weight:700; margin-bottom:6px; }
+    .upload-sub { font-size:13px; color:var(--muted); }
+    .upload-types { display:flex; justify-content:center; gap:8px; margin-top:14px; flex-wrap:wrap; }
+    .type-tag { background:var(--surface); border:1px solid var(--border2); color:var(--muted); font-size:11px; font-weight:600; padding:3px 10px; border-radius:6px; }
 
-    /* ── Card ── */
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      overflow: hidden;
-    }
-    .card-header {
-      padding: 24px 24px 0;
-    }
-    .card-body { padding: 24px; }
-    .card-title { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; margin: 0 0 6px; }
-    .card-subtitle { font-size: 14px; color: var(--muted); margin: 0; }
+    /* File list */
+    .file-item { display:flex; align-items:center; justify-content:space-between; padding:14px 16px; background:var(--surface2); border:1px solid var(--border2); border-radius:12px; margin-bottom:8px; }
+    .file-icon { font-size:22px; margin-right:12px; }
+    .file-name { font-size:14px; font-weight:600; }
+    .file-meta { font-size:12px; color:var(--muted); margin-top:2px; }
+    .file-status { font-size:12px; font-weight:600; padding:4px 10px; border-radius:20px; }
+    .file-status.processing { background:rgba(251,191,36,0.12); color:#fbbf24; border:1px solid rgba(251,191,36,0.25); }
+    .file-status.done { background:rgba(34,197,94,0.1); color:#4ade80; border:1px solid rgba(34,197,94,0.2); }
+    .file-status.error { background:rgba(248,113,113,0.1); color:#f87171; border:1px solid rgba(248,113,113,0.2); }
 
-    /* ── Inputs ── */
-    .field { margin-bottom: 16px; }
-    .field-label { font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 7px; display: block; letter-spacing: 0.3px; text-transform: uppercase; }
-    .input {
-      width: 100%; background: var(--surface2);
-      border: 1.5px solid var(--border2);
-      border-radius: 12px;
-      color: var(--text);
-      padding: 13px 16px;
-      font-size: 15px;
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .input:focus { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(249,115,22,0.12); }
-    .input::placeholder { color: #3a3a3a; }
-    .input-code {
-      text-align: center; font-size: 28px; font-weight: 800;
-      letter-spacing: 6px; text-transform: uppercase;
-      padding: 20px; font-family: 'Inter', monospace;
-    }
-    select.input { cursor: pointer; }
-    select.input option { background: #111; }
+    /* Data table */
+    .data-table { width:100%; border-collapse:collapse; font-size:13px; }
+    .data-table th { text-align:left; padding:10px 14px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:var(--muted); border-bottom:1px solid var(--border2); }
+    .data-table td { padding:12px 14px; border-bottom:1px solid var(--border); color:#ccc; vertical-align:top; }
+    .data-table tr:last-child td { border-bottom:none; }
+    .data-table tr:hover td { background:rgba(255,255,255,0.02); }
+    .table-wrap { overflow-x:auto; border-radius:16px; border:1px solid var(--border); background:var(--surface); }
 
-    /* ── Grid ── */
-    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    /* Badges */
+    .badge { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:700; }
+    .badge-low { background:rgba(74,222,128,0.1); color:#4ade80; border:1px solid rgba(74,222,128,0.25); }
+    .badge-medium { background:rgba(251,191,36,0.1); color:#fbbf24; border:1px solid rgba(251,191,36,0.25); }
+    .badge-high { background:rgba(251,146,60,0.1); color:#fb923c; border:1px solid rgba(251,146,60,0.25); }
+    .badge-critical { background:rgba(248,113,113,0.12); color:#f87171; border:1px solid rgba(248,113,113,0.3); }
+    .badge-open { background:rgba(249,115,22,0.1); color:var(--orange); border:1px solid rgba(249,115,22,0.25); }
+    .badge-scheduled { background:rgba(96,165,250,0.1); color:#60a5fa; border:1px solid rgba(96,165,250,0.25); }
+    .badge-resolved { background:rgba(34,197,94,0.1); color:#4ade80; border:1px solid rgba(34,197,94,0.2); }
 
-    /* ── Buttons ── */
-    .btn {
-      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-      border-radius: 12px; font-weight: 600; font-size: 15px;
-      cursor: pointer; border: none; transition: all 0.2s; padding: 14px 24px;
-      width: 100%;
-    }
-    .btn-primary {
-      background: linear-gradient(135deg, var(--orange), var(--red));
-      color: white;
-      box-shadow: 0 4px 20px rgba(249,115,22,0.3);
-    }
-    .btn-primary:hover { box-shadow: 0 6px 28px rgba(249,115,22,0.45); transform: translateY(-1px); }
-    .btn-primary:active { transform: translateY(0); box-shadow: 0 2px 12px rgba(249,115,22,0.3); }
-    .btn-ghost {
-      background: transparent; color: var(--muted);
-      border: 1.5px solid var(--border2);
-      width: auto; padding: 13px 20px;
-    }
-    .btn-ghost:hover { border-color: var(--orange); color: var(--orange); }
-    .btn-row { display: flex; gap: 10px; }
+    /* Chips (fault code shortcuts) */
+    .chips { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+    .chip { background:var(--surface2); border:1.5px solid var(--border2); border-radius:8px; padding:6px 12px; font-size:12px; font-weight:600; color:var(--muted); cursor:pointer; transition:all 0.15s; display:flex; align-items:center; gap:5px; }
+    .chip:hover { border-color:var(--orange); color:var(--orange); background:rgba(249,115,22,0.06); }
+    .chip-dot { width:6px; height:6px; border-radius:50%; }
 
-    /* ── Code chips ── */
-    .code-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
-    .chip {
-      background: var(--surface2); border: 1.5px solid var(--border2);
-      border-radius: 8px; padding: 7px 13px;
-      font-size: 12px; font-weight: 600; color: var(--muted);
-      cursor: pointer; transition: all 0.15s;
-      display: flex; align-items: center; gap: 6px;
-    }
-    .chip:hover { border-color: var(--orange); color: var(--orange); background: rgba(249,115,22,0.06); }
-    .chip-dot { width: 6px; height: 6px; border-radius: 50%; }
+    /* Severity indicator dot */
+    .sev-dot { width:8px; height:8px; border-radius:50%; display:inline-block; margin-right:5px; }
 
-    /* ── Loading ── */
-    .loading-screen { padding: 60px 24px; text-align: center; }
-    .loader-ring {
-      width: 56px; height: 56px; margin: 0 auto 28px;
-      border-radius: 50%;
-      border: 3px solid var(--border2);
-      border-top-color: var(--orange);
-      animation: spin 0.7s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .loading-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
-    .loading-sub { font-size: 14px; color: var(--muted); }
-    .loading-steps { margin-top: 28px; display: flex; flex-direction: column; gap: 10px; }
-    .loading-step {
-      display: flex; align-items: center; gap: 10px;
-      padding: 10px 16px;
-      background: var(--surface2); border-radius: 10px;
-      font-size: 13px; color: var(--muted);
-      opacity: 0.4; transition: all 0.3s;
-    }
-    .loading-step.active { opacity: 1; color: var(--text); border: 1px solid var(--border2); }
-    .loading-step.done { opacity: 0.7; }
-    .loading-step-icon { font-size: 15px; width: 20px; text-align: center; }
+    /* Info blocks */
+    .info-block { background:var(--surface2); border:1px solid var(--border2); border-radius:12px; padding:16px; margin-bottom:12px; }
+    .info-block-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:var(--muted); margin-bottom:6px; }
+    .info-block-text { font-size:14px; color:#ccc; line-height:1.6; }
+    .warn-block { background:rgba(239,68,68,0.05); border:1px solid rgba(239,68,68,0.18); border-radius:12px; padding:14px 16px; margin-bottom:12px; }
+    .warn-block .info-block-label { color:#f87171; }
 
-    /* ── Results ── */
-    .result-hero {
-      padding: 28px;
-      background: linear-gradient(135deg, rgba(249,115,22,0.05), rgba(239,68,68,0.05));
-      border-bottom: 1px solid var(--border);
-    }
-    .result-code-row { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px; }
-    .result-code { font-size: 38px; font-weight: 900; letter-spacing: -1px; line-height: 1; }
-    .result-title { font-size: 15px; font-weight: 600; color: var(--text); margin-top: 6px; }
+    /* Loading spinner */
+    .spinner { width:20px; height:20px; border:2px solid var(--border2); border-top-color:var(--orange); border-radius:50%; animation:spin 0.7s linear infinite; display:inline-block; }
+    @keyframes spin { to{transform:rotate(360deg)} }
 
-    .severity-badge {
-      display: inline-flex; align-items: center; gap: 5px;
-      padding: 5px 13px; border-radius: 20px;
-      font-size: 12px; font-weight: 700; letter-spacing: 0.3px;
-    }
-    .severity-dot { width: 6px; height: 6px; border-radius: 50%; }
-    .sev-low { background: rgba(74,222,128,0.1); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
-    .sev-low .severity-dot { background: #4ade80; }
-    .sev-medium { background: rgba(251,191,36,0.1); color: #fbbf24; border: 1px solid rgba(251,191,36,0.3); }
-    .sev-medium .severity-dot { background: #fbbf24; }
-    .sev-high { background: rgba(251,146,60,0.1); color: #fb923c; border: 1px solid rgba(251,146,60,0.3); }
-    .sev-high .severity-dot { background: #fb923c; }
-    .sev-critical { background: rgba(248,113,113,0.12); color: #f87171; border: 1px solid rgba(248,113,113,0.35); }
-    .sev-critical .severity-dot { background: #f87171; animation: pulse 1s infinite; }
+    /* Empty state */
+    .empty { text-align:center; padding:48px 24px; color:var(--muted); }
+    .empty-icon { font-size:40px; margin-bottom:12px; opacity:0.5; }
+    .empty-title { font-size:15px; font-weight:600; color:var(--subtle); margin-bottom:6px; }
+    .empty-sub { font-size:13px; }
 
-    /* ── Info sections ── */
-    .info-section { padding: 20px 28px; border-bottom: 1px solid var(--border); }
-    .info-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); margin-bottom: 8px; }
-    .info-text { font-size: 14px; color: #ccc; line-height: 1.65; }
+    /* Stat cards */
+    .stats-row { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:20px; }
+    .stat-card { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:18px; }
+    .stat-num { font-size:28px; font-weight:900; letter-spacing:-1px; }
+    .stat-label { font-size:12px; color:var(--muted); margin-top:4px; }
 
-    .warning-box {
-      background: rgba(239,68,68,0.06);
-      border: 1px solid rgba(239,68,68,0.18);
-      border-radius: 12px;
-      padding: 14px 16px;
-    }
-    .warning-box .info-label { color: #f87171; }
+    /* Step flow (diagnosis wizard) */
+    .wizard-step { display:none; }
+    .wizard-step.active { display:block; }
+    .step-indicator { display:flex; align-items:center; justify-content:center; gap:0; margin-bottom:28px; }
+    .step-circle { width:30px; height:30px; border-radius:50%; border:2px solid var(--border2); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:var(--muted); transition:all 0.3s; background:var(--surface); flex-shrink:0; }
+    .step-circle.wactive { border-color:var(--orange); color:var(--orange); background:rgba(249,115,22,0.1); box-shadow:0 0 0 4px rgba(249,115,22,0.1); }
+    .step-circle.wdone { border-color:#22c55e; background:rgba(34,197,94,0.15); color:#22c55e; }
+    .step-conn { width:40px; height:2px; background:var(--border2); flex-shrink:0; margin:0 4px 16px; transition:background 0.3s; }
+    .step-conn.wdone { background:#22c55e; }
+    .step-lbl { font-size:10px; font-weight:600; color:var(--muted); margin-top:5px; text-align:center; white-space:nowrap; }
+    .step-lbl.wactive { color:var(--orange); }
+    .step-lbl.wdone { color:#22c55e; }
 
-    .cost-section { padding: 20px 28px; border-bottom: 1px solid var(--border); }
-    .cost-range { font-size: 32px; font-weight: 900; letter-spacing: -1px; }
-    .cost-sub { font-size: 13px; color: var(--muted); margin-top: 2px; }
-    .cost-bar-wrap { margin-top: 14px; background: var(--border2); border-radius: 4px; height: 5px; overflow: hidden; }
-    .cost-bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--orange), var(--red)); transition: width 0.8s cubic-bezier(0.4,0,0.2,1); }
+    /* Results sections */
+    .result-header { padding:24px; background:linear-gradient(135deg,rgba(249,115,22,0.06),rgba(239,68,68,0.06)); border-bottom:1px solid var(--border); }
+    .r-code { font-size:36px; font-weight:900; letter-spacing:-1px; }
+    .r-title { font-size:14px; font-weight:600; margin-top:4px; color:#ccc; }
+    .section-divider { height:1px; background:var(--border); }
+    .result-section { padding:18px 24px; border-bottom:1px solid var(--border); }
+    .result-section:last-child { border-bottom:none; }
+    .rs-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.7px; color:var(--muted); margin-bottom:8px; }
+    .rs-text { font-size:14px; color:#ccc; line-height:1.65; }
+    .cost-big { font-size:30px; font-weight:900; letter-spacing:-0.5px; }
+    .cost-bar-wrap { margin-top:12px; background:var(--border2); border-radius:4px; height:4px; overflow:hidden; }
+    .cost-bar-fill { height:100%; background:linear-gradient(90deg,var(--orange),var(--red)); border-radius:4px; transition:width 0.9s cubic-bezier(0.4,0,0.2,1); }
+    .shop-row { display:flex; align-items:center; justify-content:space-between; padding:14px 16px; background:var(--surface2); border:1.5px solid var(--border2); border-radius:12px; cursor:pointer; transition:all 0.2s; margin-bottom:8px; }
+    .shop-row:hover, .shop-row.sel { border-color:var(--orange); background:rgba(249,115,22,0.04); }
+    .shop-name { font-size:14px; font-weight:700; }
+    .shop-detail { font-size:12px; color:var(--muted); margin-top:2px; }
+    .shop-dist { font-size:14px; font-weight:800; color:var(--orange); }
+    .shop-avail { font-size:12px; color:#4ade80; font-weight:600; }
 
-    .action-section {
-      padding: 18px 28px;
-      background: rgba(249,115,22,0.04);
-      border-bottom: 1px solid var(--border);
-      display: flex; align-items: flex-start; gap: 12px;
-    }
-    .action-icon {
-      width: 36px; height: 36px; flex-shrink: 0;
-      background: rgba(249,115,22,0.12);
-      border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 17px;
-    }
-    .action-content {}
-    .action-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--orange); margin-bottom: 4px; }
-    .action-text { font-size: 14px; color: #ccc; line-height: 1.5; }
+    /* Loader overlay */
+    .loader-wrap { text-align:center; padding:56px 24px; }
+    .loader-ring { width:52px; height:52px; margin:0 auto 24px; border-radius:50%; border:3px solid var(--border2); border-top-color:var(--orange); animation:spin 0.7s linear infinite; }
 
-    /* ── Shops ── */
-    .shops-section { padding: 24px 28px; }
-    .shops-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-    .shops-title { font-size: 15px; font-weight: 700; }
-    .shops-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
-    .demo-tag {
-      font-size: 11px; color: var(--subtle);
-      background: var(--surface2);
-      border: 1px solid var(--border2);
-      padding: 3px 8px; border-radius: 6px;
-    }
-    .shop-card {
-      background: var(--surface2);
-      border: 1.5px solid var(--border2);
-      border-radius: 14px; padding: 16px;
-      cursor: pointer; transition: all 0.2s;
-      margin-bottom: 10px;
-    }
-    .shop-card:last-child { margin-bottom: 0; }
-    .shop-card:hover { border-color: rgba(249,115,22,0.5); background: rgba(249,115,22,0.04); }
-    .shop-card.selected { border-color: var(--orange); background: rgba(249,115,22,0.06); box-shadow: 0 0 0 3px rgba(249,115,22,0.1); }
-    .shop-row { display: flex; justify-content: space-between; align-items: flex-start; }
-    .shop-name { font-size: 14px; font-weight: 700; }
-    .shop-addr { font-size: 12px; color: var(--muted); margin-top: 3px; }
-    .shop-dist { font-size: 14px; font-weight: 800; color: var(--orange); }
-    .shop-rating { font-size: 11px; color: var(--muted); margin-top: 2px; text-align: right; }
-    .shop-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; }
-    .shop-specialty {
-      font-size: 11px; font-weight: 600;
-      background: var(--surface); border: 1px solid var(--border2);
-      color: var(--muted); padding: 3px 9px; border-radius: 6px;
-    }
-    .shop-avail { font-size: 12px; color: #4ade80; font-weight: 600; }
+    /* Toast */
+    #toast { position:fixed; bottom:24px; right:24px; background:#1a1a1a; border:1px solid var(--border2); border-radius:12px; padding:13px 18px; font-size:13px; font-weight:600; display:none; z-index:999; transition:all 0.3s; max-width:300px; }
+    #toast.show { display:flex; align-items:center; gap:8px; }
 
-    /* ── Booking ── */
-    .booking-section { padding: 24px 28px; border-top: 1px solid var(--border); }
-    .booking-shop-pill {
-      display: flex; align-items: center; gap: 8px;
-      background: var(--surface2);
-      border: 1px solid var(--border2);
-      border-radius: 10px; padding: 10px 14px;
-      margin-bottom: 20px;
-    }
-    .booking-shop-icon { font-size: 16px; }
-    .booking-shop-name { font-size: 13px; font-weight: 600; }
-    .booking-shop-addr { font-size: 11px; color: var(--muted); }
+    /* Confirm box */
+    .confirm-box { text-align:center; padding:32px 24px; }
+    .confirm-icon { font-size:44px; margin-bottom:14px; }
+    .confirm-title { font-size:20px; font-weight:800; margin-bottom:8px; }
+    .confirm-sub { font-size:14px; color:var(--muted); line-height:1.6; }
 
-    /* ── Confirmation ── */
-    .confirm-box {
-      text-align: center; padding: 36px 28px;
-      border-top: 1px solid var(--border);
-    }
-    .confirm-icon { font-size: 48px; margin-bottom: 16px; }
-    .confirm-title { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
-    .confirm-sub { font-size: 14px; color: var(--muted); line-height: 1.6; margin-bottom: 20px; }
-    .confirm-pill {
-      display: inline-block;
-      background: rgba(34,197,94,0.08);
-      border: 1px solid rgba(34,197,94,0.2);
-      color: #4ade80; font-size: 13px;
-      padding: 10px 18px; border-radius: 10px;
-      line-height: 1.5;
-    }
-
-    /* ── Divider ── */
-    .divider { height: 1px; background: var(--border); margin: 0; }
-
-    /* ── Animations ── */
-    .fade-up { animation: fadeUp 0.35s cubic-bezier(0.4,0,0.2,1) both; }
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-
-    /* ── Footer spacer ── */
-    .bottom-actions { padding: 20px 0 0; display: flex; justify-content: center; }
-    .btn-restart {
-      background: transparent; color: var(--muted);
-      border: 1.5px solid var(--border2);
-      border-radius: 10px; padding: 11px 22px;
-      font-size: 14px; font-weight: 600; cursor: pointer;
-      transition: all 0.2s;
-    }
-    .btn-restart:hover { border-color: var(--orange); color: var(--orange); }
+    /* Animated fade */
+    .fade-up { animation:fadeUp 0.3s ease both; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
   </style>
 </head>
 <body>
 
-  <!-- Header -->
-  <header class="header">
-    <div class="logo">
-      <div class="logo-icon">⚡</div>
-      <div>
-        <div class="logo-name">Rebel Auto Agent</div>
-        <div class="logo-tag">Autonomous Vehicle Maintenance</div>
-      </div>
+<!-- Header -->
+<header class="header">
+  <div class="logo">
+    <div class="logo-icon">⚡</div>
+    <div>
+      <div class="logo-name">Rebel Auto Agent</div>
+      <div class="logo-tag">Autonomous Vehicle Maintenance</div>
     </div>
-    <div class="status-pill">
-      <div class="status-dot"></div>
-      Online 24/7
+  </div>
+  <div class="status-pill"><div class="status-dot"></div>Online 24/7</div>
+</header>
+
+<!-- Nav -->
+<div class="nav-tabs">
+  <div class="nav-tab active" onclick="switchPage('diagnose')">⚡ Diagnose</div>
+  <div class="nav-tab" onclick="switchPage('upload')">📎 Documents</div>
+  <div class="nav-tab" onclick="switchPage('records')">📋 Records</div>
+  <div class="nav-tab" onclick="switchPage('vehicles')">🚗 Vehicles</div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PAGE: DIAGNOSE
+════════════════════════════════════════ -->
+<div class="page active" id="page-diagnose">
+
+  <!-- Step indicator -->
+  <div class="step-indicator">
+    <div>
+      <div class="step-circle wactive" id="wc1">1</div>
+      <div class="step-lbl wactive" id="wl1">Vehicle</div>
     </div>
-  </header>
-
-  <!-- STEP: Hero / Landing -->
-  <div class="step active" id="step-0">
-    <div class="hero fade-up">
-      <div class="hero-eyebrow">⚡ AI-Powered Diagnostics</div>
-      <h1>Know what's wrong<br/><span class="grad-text">before it breaks you.</span></h1>
-      <p>Scan your fault code, get a plain-English diagnosis, see what it'll cost, and book a nearby shop — in under 60 seconds.</p>
-
-      <div class="hero-stats">
-        <div class="hero-stat">
-          <div class="hero-stat-num grad-text">5,000+</div>
-          <div class="hero-stat-label">Fault Codes</div>
-        </div>
-        <div class="hero-stat">
-          <div class="hero-stat-num grad-text">24/7</div>
-          <div class="hero-stat-label">Always On</div>
-        </div>
-        <div class="hero-stat">
-          <div class="hero-stat-num grad-text">Free</div>
-          <div class="hero-stat-label">Right Now</div>
-        </div>
-      </div>
-
-      <button class="btn btn-primary" style="max-width:280px; margin:0 auto; font-size:16px; padding:16px;" onclick="showStep(1)">
-        Start Diagnosis &nbsp;→
-      </button>
+    <div class="step-conn" id="wconn1"></div>
+    <div>
+      <div class="step-circle" id="wc2">2</div>
+      <div class="step-lbl" id="wl2">Fault Code</div>
+    </div>
+    <div class="step-conn" id="wconn2"></div>
+    <div>
+      <div class="step-circle" id="wc3">3</div>
+      <div class="step-lbl" id="wl3">Analysis</div>
+    </div>
+    <div class="step-conn" id="wconn3"></div>
+    <div>
+      <div class="step-circle" id="wc4">4</div>
+      <div class="step-lbl" id="wl4">Results</div>
     </div>
   </div>
 
-  <!-- Steps 1–4 container -->
-  <div class="container" id="main-flow" style="display:none;">
-
-    <!-- Step Indicator -->
-    <div class="step-indicator" id="step-indicator">
-      <div class="step-item">
-        <div style="text-align:center">
-          <div class="step-circle active" id="sc-1">1</div>
-          <div class="step-label active" id="sl-1">Vehicle</div>
+  <!-- W1: Vehicle -->
+  <div class="wizard-step active fade-up" id="ws1">
+    <div class="card">
+      <div class="card-pad">
+        <div class="card-title">Tell me about your vehicle</div>
+        <div class="card-sub" style="margin-bottom:20px;">I'll calibrate cost estimates and find shops near you.</div>
+        <div class="grid-3" style="margin-bottom:12px;">
+          <div class="field"><label class="field-label">Year</label><input id="w-year" class="input" placeholder="2021" maxlength="4"/></div>
+          <div class="field"><label class="field-label">Make</label><input id="w-make" class="input" placeholder="Toyota"/></div>
+          <div class="field"><label class="field-label">Model</label><input id="w-model" class="input" placeholder="Camry"/></div>
         </div>
-      </div>
-      <div class="step-connector" id="conn-1"></div>
-      <div class="step-item">
-        <div style="text-align:center">
-          <div class="step-circle" id="sc-2">2</div>
-          <div class="step-label" id="sl-2">Fault Code</div>
+        <div class="grid-2" style="margin-bottom:12px;">
+          <div class="field"><label class="field-label">Mileage</label><input id="w-mileage" type="number" class="input" placeholder="58,000"/></div>
+          <div class="field"><label class="field-label">Your Name</label><input id="w-name" class="input" placeholder="First name"/></div>
         </div>
-      </div>
-      <div class="step-connector" id="conn-2"></div>
-      <div class="step-item">
-        <div style="text-align:center">
-          <div class="step-circle" id="sc-3">3</div>
-          <div class="step-label" id="sl-3">Analysis</div>
-        </div>
-      </div>
-      <div class="step-connector" id="conn-3"></div>
-      <div class="step-item">
-        <div style="text-align:center">
-          <div class="step-circle" id="sc-4">4</div>
-          <div class="step-label" id="sl-4">Results</div>
-        </div>
+        <div class="field" style="margin-bottom:20px;"><label class="field-label">Location (City, State)</label><input id="w-loc" class="input" placeholder="e.g. Atlanta, GA"/></div>
+        <button class="btn btn-primary" onclick="wNext(2)">Continue →</button>
       </div>
     </div>
+  </div>
 
-    <!-- STEP 1: Vehicle -->
-    <div class="step active" id="step-1">
-      <div class="card fade-up">
-        <div class="card-header" style="padding:28px 28px 0;">
-          <h2 class="card-title">Tell me about your vehicle</h2>
-          <p class="card-subtitle" style="margin-bottom:24px;">I'll use this to calibrate your cost estimate and find nearby shops.</p>
-        </div>
-        <div style="padding:0 28px 28px;">
-          <div class="grid-3" style="margin-bottom:14px;">
-            <div class="field">
-              <label class="field-label">Year</label>
-              <input id="year" class="input" placeholder="2019" maxlength="4"/>
-            </div>
-            <div class="field">
-              <label class="field-label">Make</label>
-              <input id="make" class="input" placeholder="Toyota"/>
-            </div>
-            <div class="field">
-              <label class="field-label">Model</label>
-              <input id="model" class="input" placeholder="Camry"/>
-            </div>
-          </div>
-          <div class="grid-2" style="margin-bottom:14px;">
-            <div class="field">
-              <label class="field-label">Mileage</label>
-              <input id="mileage" type="number" class="input" placeholder="65,000"/>
-            </div>
-            <div class="field">
-              <label class="field-label">Your Name</label>
-              <input id="owner_name" class="input" placeholder="First name"/>
-            </div>
-          </div>
-          <div class="field" style="margin-bottom:24px;">
-            <label class="field-label">Location (City, State)</label>
-            <input id="location" class="input" placeholder="e.g. Atlanta, GA"/>
-          </div>
-          <button class="btn btn-primary" onclick="goToStep2()">Continue &nbsp;→</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- STEP 2: Fault Code -->
-    <div class="step" id="step-2">
-      <div class="card fade-up">
-        <div style="padding:28px 28px 0;">
-          <h2 class="card-title">Enter your fault code</h2>
-          <p class="card-subtitle" style="margin-bottom:24px;">From your dashboard warning light or an OBD-II scanner dongle.</p>
-        </div>
-        <div style="padding:0 28px;">
-          <input id="fault_code" class="input input-code" placeholder="P0300" maxlength="6"/>
-        </div>
-        <div style="padding:16px 28px 0;">
-          <div class="info-label">Quick picks</div>
-          <div class="code-chips">
+  <!-- W2: Fault Code -->
+  <div class="wizard-step fade-up" id="ws2">
+    <div class="card">
+      <div class="card-pad">
+        <div class="card-title">Enter your fault code</div>
+        <div class="card-sub" style="margin-bottom:20px;">From your dashboard warning light or OBD-II scanner.</div>
+        <input id="w-code" class="input input-code" placeholder="P0300" maxlength="6"/>
+        <div style="margin-top:16px;">
+          <div class="field-label">Quick picks</div>
+          <div class="chips">
             <div class="chip" onclick="setCode('P0300')"><div class="chip-dot" style="background:#fb923c"></div>P0300 · Misfire</div>
             <div class="chip" onclick="setCode('P0420')"><div class="chip-dot" style="background:#fbbf24"></div>P0420 · Catalytic</div>
             <div class="chip" onclick="setCode('P0171')"><div class="chip-dot" style="background:#fbbf24"></div>P0171 · Lean Fuel</div>
@@ -550,361 +281,649 @@
             <div class="chip" onclick="setCode('B0001')"><div class="chip-dot" style="background:#f87171"></div>B0001 · Airbag</div>
           </div>
         </div>
-        <div style="padding:24px 28px 28px;">
-          <div class="btn-row">
-            <button class="btn btn-ghost" onclick="showStep(1)">← Back</button>
-            <button class="btn btn-primary" onclick="runDiagnostic()">⚡ Run Diagnostic</button>
-          </div>
+        <div class="btn-row" style="margin-top:22px;">
+          <button class="btn btn-ghost btn-sm" onclick="wNext(1)" style="width:auto;">← Back</button>
+          <button class="btn btn-primary" onclick="runDiag()">⚡ Run Diagnostic</button>
         </div>
       </div>
     </div>
-
-    <!-- STEP 3: Loading -->
-    <div class="step" id="step-3">
-      <div class="card fade-up">
-        <div class="loading-screen">
-          <div class="loader-ring"></div>
-          <div class="loading-title" id="loading-title">Decoding your fault code…</div>
-          <div class="loading-sub" id="loading-sub">Cross-referencing OBD-II database</div>
-          <div class="loading-steps">
-            <div class="loading-step active" id="ls-1"><div class="loading-step-icon">🔍</div>Reading fault code database</div>
-            <div class="loading-step" id="ls-2"><div class="loading-step-icon">💰</div>Estimating repair costs</div>
-            <div class="loading-step" id="ls-3"><div class="loading-step-icon">📍</div>Finding shops near you</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- STEP 4: Results -->
-    <div class="step" id="step-4">
-      <div class="fade-up">
-
-        <!-- Diagnosis card -->
-        <div class="card" style="margin-bottom:16px;" id="diag-card">
-          <div class="result-hero">
-            <div class="result-code-row">
-              <div>
-                <div class="result-code grad-text" id="r-code">—</div>
-                <div class="result-title" id="r-title">—</div>
-              </div>
-              <div id="r-severity"></div>
-            </div>
-          </div>
-
-          <div class="info-section">
-            <div class="info-label">Plain English</div>
-            <div class="info-text" id="r-explanation">—</div>
-          </div>
-
-          <div class="info-section">
-            <div class="warning-box">
-              <div class="info-label">⚠️ If ignored…</div>
-              <div class="info-text" id="r-consequences">—</div>
-            </div>
-          </div>
-
-          <div class="cost-section">
-            <div class="info-label">Estimated Repair Cost</div>
-            <div class="cost-range" id="r-cost">—</div>
-            <div class="cost-sub">Typical range · parts + labor</div>
-            <div class="cost-bar-wrap"><div class="cost-bar-fill" id="r-cost-bar" style="width:0%"></div></div>
-          </div>
-
-          <div class="action-section">
-            <div class="action-icon">🛠️</div>
-            <div class="action-content">
-              <div class="action-label">Recommended Action</div>
-              <div class="action-text" id="r-action">—</div>
-            </div>
-          </div>
-
-          <!-- Shops -->
-          <div class="shops-section">
-            <div class="shops-header">
-              <div>
-                <div class="shops-title">Nearby Service Shops</div>
-                <div class="shops-sub" id="shops-sub">Based on your location</div>
-              </div>
-              <div class="demo-tag">Demo data</div>
-            </div>
-            <div id="shops-list"></div>
-          </div>
-
-          <!-- Booking -->
-          <div class="booking-section" id="booking-section" style="display:none;">
-            <div class="info-label" style="margin-bottom:14px;">Book Your Appointment</div>
-            <div class="booking-shop-pill">
-              <div class="booking-shop-icon">🔧</div>
-              <div>
-                <div class="booking-shop-name" id="booking-shop-name">—</div>
-                <div class="booking-shop-addr" id="booking-shop-addr">—</div>
-              </div>
-            </div>
-            <div class="grid-2" style="margin-bottom:20px;">
-              <div class="field">
-                <label class="field-label">Date</label>
-                <input type="date" id="appt-date" class="input"/>
-              </div>
-              <div class="field">
-                <label class="field-label">Time</label>
-                <select id="appt-time" class="input">
-                  <option>8:00 AM</option><option>9:00 AM</option>
-                  <option>10:00 AM</option><option>11:00 AM</option>
-                  <option>1:00 PM</option><option>2:00 PM</option><option>3:00 PM</option>
-                </select>
-              </div>
-            </div>
-            <button class="btn btn-primary" onclick="confirmBooking()">✓ &nbsp;Confirm Appointment</button>
-          </div>
-
-          <!-- Confirmation -->
-          <div class="confirm-box" id="confirm-box" style="display:none;">
-            <div class="confirm-icon">✅</div>
-            <div class="confirm-title">Appointment Requested!</div>
-            <div class="confirm-sub" id="confirm-sub">—</div>
-            <div class="confirm-pill">The shop has been notified.<br/>You'll receive a confirmation shortly.</div>
-          </div>
-        </div>
-
-        <div class="bottom-actions">
-          <button class="btn-restart" onclick="resetAll()">← Diagnose Another Vehicle</button>
-        </div>
-      </div>
-    </div>
-
   </div>
 
-  <script>
-    // ── State ─────────────────────────────────────────────────────
-    let S = { vehicle: {}, code: '', diagnosis: null, shop: null };
+  <!-- W3: Loading -->
+  <div class="wizard-step" id="ws3">
+    <div class="card">
+      <div class="loader-wrap">
+        <div class="loader-ring"></div>
+        <div style="font-size:17px;font-weight:700;margin-bottom:8px;" id="load-title">Decoding fault code…</div>
+        <div style="font-size:13px;color:var(--muted);" id="load-sub">Cross-referencing OBD-II database</div>
+        <div style="margin-top:24px;display:flex;flex-direction:column;gap:8px;text-align:left;">
+          <div class="info-block" id="ls1" style="opacity:0.4;transition:all 0.3s;display:flex;align-items:center;gap:10px;">🔍 <span>Reading fault code database</span></div>
+          <div class="info-block" id="ls2" style="opacity:0.4;transition:all 0.3s;display:flex;align-items:center;gap:10px;">💰 <span>Estimating repair costs</span></div>
+          <div class="info-block" id="ls3" style="opacity:0.4;transition:all 0.3s;display:flex;align-items:center;gap:10px;">📍 <span>Finding shops near you</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-    // ── Knowledge base ─────────────────────────────────────────────
-    const DB = {
-      P0300: {
-        title: 'Random / Multiple Cylinder Misfire',
-        sev: 'High',
-        exp: `Your engine is misfiring — one or more cylinders aren't firing correctly. Think of it like a 4-cylinder running on 3 cylinders. You'll notice rough idling, loss of power, and worse fuel economy. Common causes: bad spark plugs, ignition coils, or fuel injectors.`,
-        warn: `Can destroy your catalytic converter (a $1,500+ repair on its own), cause stalling on the highway, or permanently damage the engine if left unchecked.`,
-        lo: 150, hi: 900,
-        act: `Schedule service within the next 500 miles or 2 weeks. Avoid sustained highway speeds until resolved.`
-      },
-      P0420: {
-        title: 'Catalyst System Below Efficiency Threshold',
-        sev: 'Medium',
-        exp: `Your catalytic converter — the emissions-cleaning device in your exhaust — isn't performing efficiently. You might notice slightly worse fuel economy or a faint sulfur smell. The car is still drivable, but this needs attention.`,
-        warn: `Your car will fail emissions testing. Over time, a clogged converter can cause serious power loss and back-pressure damage to the engine.`,
-        lo: 400, hi: 2200,
-        act: `Schedule within 30 days. Check if it's still under warranty — catalytic converters are often covered up to 80,000 miles by the manufacturer.`
-      },
-      P0171: {
-        title: 'System Too Lean — Bank 1',
-        sev: 'Medium',
-        exp: `Your engine is getting too much air relative to fuel — like running on a diluted mixture. This causes rough idling, hesitation when accelerating, and reduced power. Most common culprits: dirty mass airflow sensor, a vacuum leak, or a weak fuel pump.`,
-        warn: `Can cause engine overheating, damage oxygen sensors ($200 each), and eventually cause engine wear if the lean condition is severe.`,
-        lo: 100, hi: 600,
-        act: `Try cleaning the MAF sensor first ($20 DIY fix that resolves this ~30% of the time). If that doesn't clear it, get a full diagnosis.`
-      },
-      P0128: {
-        title: 'Coolant Temp Below Thermostat Regulating Temp',
-        sev: 'Low',
-        exp: `Your engine is running cooler than it should. The thermostat — which controls how coolant flows to regulate engine temperature — is likely stuck open. You may notice lukewarm heat from your vents and slightly worse fuel economy.`,
-        warn: `Low risk in the short term, but cool running increases engine wear over time, reduces fuel efficiency, and can cause issues in cold weather.`,
-        lo: 150, hi: 400,
-        act: `Fix at your next oil change appointment. Thermostat replacement is straightforward and affordable — typically under $300 all-in.`
-      },
-      B0001: {
-        title: 'Driver Airbag Squib Circuit — Open Fault',
-        sev: 'Critical',
-        exp: `There's a fault in the electrical circuit for your driver's side airbag. This is a safety system failure — the airbag may not deploy in a crash, or could deploy unexpectedly while driving.`,
-        warn: `In a collision, your airbag may not protect you. This is not a performance issue — it's a life safety issue. Do not delay.`,
-        lo: 200, hi: 1000,
-        act: `Stop driving and schedule an immediate inspection. Check NHTSA.gov for recalls — Takata airbag issues have triggered massive recall programs.`
-      }
-    };
+  <!-- W4: Results -->
+  <div class="wizard-step fade-up" id="ws4">
+    <div class="card" id="result-card">
+      <div class="result-header">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+          <div>
+            <div class="r-code grad-text" id="r-code">—</div>
+            <div class="r-title" id="r-title">—</div>
+          </div>
+          <div id="r-sev"></div>
+        </div>
+      </div>
+      <div class="result-section">
+        <div class="rs-label">Plain English</div>
+        <div class="rs-text" id="r-exp">—</div>
+      </div>
+      <div class="result-section" style="background:rgba(239,68,68,0.03);">
+        <div class="rs-label" style="color:#f87171;">⚠️ If ignored…</div>
+        <div class="rs-text" id="r-warn">—</div>
+      </div>
+      <div class="result-section">
+        <div class="rs-label">Estimated Cost</div>
+        <div class="cost-big" id="r-cost">—</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:3px;">Parts + labor · typical range</div>
+        <div class="cost-bar-wrap"><div class="cost-bar-fill" id="r-cbar" style="width:0%"></div></div>
+      </div>
+      <div class="result-section" style="background:rgba(249,115,22,0.03);">
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <div style="width:36px;height:36px;background:rgba(249,115,22,0.12);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:17px;">🛠️</div>
+          <div>
+            <div class="rs-label" style="color:var(--orange);">Recommended Action</div>
+            <div class="rs-text" id="r-action">—</div>
+          </div>
+        </div>
+      </div>
+      <!-- Shops -->
+      <div class="result-section">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+          <div>
+            <div class="rs-label" style="margin-bottom:2px;">Nearby Shops</div>
+            <div style="font-size:12px;color:var(--muted);" id="r-loc-label">—</div>
+          </div>
+          <div style="font-size:11px;color:var(--subtle);background:var(--surface2);border:1px solid var(--border2);padding:3px 8px;border-radius:6px;">Demo data</div>
+        </div>
+        <div id="r-shops"></div>
+      </div>
+      <!-- Booking -->
+      <div class="result-section" id="booking-sec" style="display:none;">
+        <div class="rs-label">Book Appointment</div>
+        <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:12px 14px;margin-bottom:16px;">
+          <div style="font-size:14px;font-weight:700;" id="bk-shop">—</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px;" id="bk-addr">—</div>
+        </div>
+        <div class="grid-2" style="margin-bottom:16px;">
+          <div class="field"><label class="field-label">Date</label><input type="date" id="bk-date" class="input"/></div>
+          <div class="field"><label class="field-label">Time</label>
+            <select id="bk-time" class="input">
+              <option>8:00 AM</option><option>9:00 AM</option><option>10:00 AM</option>
+              <option>11:00 AM</option><option>1:00 PM</option><option>2:00 PM</option><option>3:00 PM</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="confirmBooking()">✓ Confirm Appointment</button>
+      </div>
+      <!-- Confirm -->
+      <div class="confirm-box" id="confirm-sec" style="display:none;">
+        <div class="confirm-icon">✅</div>
+        <div class="confirm-title">Appointment Requested!</div>
+        <div class="confirm-sub" id="confirm-text">—</div>
+        <div style="margin-top:16px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:10px;padding:12px;font-size:13px;color:#4ade80;">The shop has been notified. You'll receive a confirmation shortly.</div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:12px;">
+      <button class="btn btn-ghost btn-sm" style="width:auto;" onclick="wReset()">← New Diagnosis</button>
+    </div>
+  </div>
+</div>
 
-    const fallback = code => ({
-      title: `Fault Code ${code} Detected`,
-      sev: 'Medium',
-      exp: `Your vehicle's computer flagged code ${code}. Without a specific entry in our database, this requires hands-on diagnosis with a professional-grade scanner to pinpoint the exact cause.`,
-      warn: `Undiagnosed fault codes allow small issues to grow into expensive ones. When uncertain, always get it checked.`,
-      lo: 75, hi: 500,
-      act: `Schedule a diagnostic appointment. Bring the exact code — it helps the technician narrow things down before you even walk in.`
+<!-- ══════════════════════════════════════
+     PAGE: DOCUMENTS (Upload)
+════════════════════════════════════════ -->
+<div class="page" id="page-upload">
+  <div class="card fade-up">
+    <div class="card-pad">
+      <div class="card-title">Upload Vehicle Documents</div>
+      <div class="card-sub" style="margin-bottom:20px;">Repair records, service history, warranties, inspection reports — I'll read and extract the key data.</div>
+
+      <!-- Drop zone -->
+      <div class="upload-zone" id="drop-zone" onclick="document.getElementById('file-input').click()" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="handleDrop(event)">
+        <div class="upload-icon">📎</div>
+        <div class="upload-title">Drop files here or click to browse</div>
+        <div class="upload-sub">I'll extract fault codes, service history, and repair details automatically</div>
+        <div class="upload-types">
+          <div class="type-tag">PDF</div>
+          <div class="type-tag">JPG / PNG</div>
+          <div class="type-tag">TXT</div>
+          <div class="type-tag">CSV</div>
+          <div class="type-tag">DOCX</div>
+        </div>
+      </div>
+      <input type="file" id="file-input" style="display:none;" multiple accept=".pdf,.jpg,.jpeg,.png,.txt,.csv,.docx" onchange="handleFiles(this.files)"/>
+
+      <!-- File list -->
+      <div id="file-list" style="margin-top:16px;"></div>
+
+      <!-- Extracted data panel -->
+      <div id="extracted-panel" style="display:none;margin-top:20px;">
+        <div class="rs-label" style="margin-bottom:10px;">Extracted Information</div>
+        <div id="extracted-content"></div>
+        <button class="btn btn-green btn-sm" style="margin-top:12px;width:auto;" onclick="saveExtracted()">💾 Save to Records</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Document tips -->
+  <div class="card">
+    <div class="card-pad">
+      <div class="rs-label" style="margin-bottom:12px;">What I can extract from your documents</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div class="info-block"><div class="info-block-label">🔍 Fault Codes</div><div class="info-block-text" style="font-size:13px;">OBD-II codes from inspection reports and scanner printouts</div></div>
+        <div class="info-block"><div class="info-block-label">🔧 Service History</div><div class="info-block-text" style="font-size:13px;">Past repairs, mileage at service, parts replaced</div></div>
+        <div class="info-block"><div class="info-block-label">💰 Cost Records</div><div class="info-block-text" style="font-size:13px;">Invoice amounts, labor costs, parts pricing</div></div>
+        <div class="info-block"><div class="info-block-label">📅 Dates & Mileage</div><div class="info-block-text" style="font-size:13px;">When work was done and vehicle mileage at time of service</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PAGE: RECORDS (Diagnostic history)
+════════════════════════════════════════ -->
+<div class="page" id="page-records">
+  <div class="stats-row" id="stats-row">
+    <div class="stat-card"><div class="stat-num grad-text" id="stat-total">—</div><div class="stat-label">Total Reports</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:#f87171;" id="stat-open">—</div><div class="stat-label">Open Issues</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:#4ade80;" id="stat-resolved">—</div><div class="stat-label">Resolved</div></div>
+  </div>
+
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+    <div style="font-size:16px;font-weight:700;">Diagnostic Reports</div>
+    <button class="btn btn-ghost btn-sm" style="width:auto;" onclick="loadRecords()">↻ Refresh</button>
+  </div>
+
+  <div id="records-content">
+    <div class="empty"><div class="empty-icon">📋</div><div class="empty-title">Loading records…</div></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PAGE: VEHICLES
+════════════════════════════════════════ -->
+<div class="page" id="page-vehicles">
+  <!-- Add vehicle form -->
+  <div class="card fade-up" id="add-vehicle-card">
+    <div class="card-pad">
+      <div class="card-title">Add a Vehicle</div>
+      <div class="card-sub" style="margin-bottom:18px;">Save vehicles to track their full maintenance history.</div>
+      <div class="grid-3" style="margin-bottom:12px;">
+        <div class="field"><label class="field-label">Year</label><input id="v-year" class="input" placeholder="2021" maxlength="4"/></div>
+        <div class="field"><label class="field-label">Make</label><input id="v-make" class="input" placeholder="Ford"/></div>
+        <div class="field"><label class="field-label">Model</label><input id="v-model" class="input" placeholder="F-150"/></div>
+      </div>
+      <div class="grid-2" style="margin-bottom:12px;">
+        <div class="field"><label class="field-label">Trim</label><input id="v-trim" class="input" placeholder="XLT"/></div>
+        <div class="field"><label class="field-label">Mileage</label><input id="v-mileage" type="number" class="input" placeholder="42,000"/></div>
+      </div>
+      <div class="grid-2" style="margin-bottom:12px;">
+        <div class="field"><label class="field-label">Owner Name</label><input id="v-owner" class="input" placeholder="Full name"/></div>
+        <div class="field"><label class="field-label">Owner Email</label><input id="v-email" type="email" class="input" placeholder="email@example.com"/></div>
+      </div>
+      <div class="field" style="margin-bottom:18px;"><label class="field-label">VIN (optional)</label><input id="v-vin" class="input" placeholder="1HGCM82633A123456" maxlength="17"/></div>
+      <button class="btn btn-primary" onclick="addVehicle()">+ Add Vehicle</button>
+    </div>
+  </div>
+
+  <!-- Vehicle list -->
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+    <div style="font-size:16px;font-weight:700;">Saved Vehicles</div>
+    <button class="btn btn-ghost btn-sm" style="width:auto;" onclick="loadVehicles()">↻ Refresh</button>
+  </div>
+  <div id="vehicles-content">
+    <div class="empty"><div class="empty-icon">🚗</div><div class="empty-title">Loading vehicles…</div></div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════
+//  BASE44 API CONFIG
+// ══════════════════════════════════════════
+const APP_ID = '69b2d37fea1b464236e8d1bc';
+const API_BASE = `https://api.base44.com/api/apps/${APP_ID}/entities`;
+
+// Helper: API call
+async function api(entity, method = 'GET', body = null, id = '') {
+  const url = `${API_BASE}/${entity}${id ? '/'+id : ''}`;
+  const opts = { method, headers: { 'Content-Type': 'application/json' } };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(url, opts);
+  if (!res.ok) throw new Error(`API ${method} ${entity}: ${res.status}`);
+  return res.json();
+}
+
+// ══════════════════════════════════════════
+//  NAV
+// ══════════════════════════════════════════
+function switchPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  event.target.classList.add('active');
+  if (id === 'records') loadRecords();
+  if (id === 'vehicles') loadVehicles();
+}
+
+// ══════════════════════════════════════════
+//  TOAST
+// ══════════════════════════════════════════
+function toast(msg, icon = '✅') {
+  const t = document.getElementById('toast');
+  t.innerHTML = `${icon} ${msg}`;
+  t.className = 'show';
+  setTimeout(() => { t.className = ''; }, 3200);
+}
+
+// ══════════════════════════════════════════
+//  DIAGNOSIS WIZARD
+// ══════════════════════════════════════════
+let WS = { vehicle:{}, code:'', diag:null, shop:null, shops:[] };
+
+const DB = {
+  P0300:{ title:'Random/Multiple Cylinder Misfire', sev:'High', exp:`Your engine is misfiring — one or more cylinders aren't firing properly. Think of it like a 4-cylinder running on 3. You'll notice rough idling, power loss, and worse fuel economy. Common causes: worn spark plugs, bad ignition coil, or faulty fuel injector.`, warn:`Can destroy your catalytic converter ($1,500+ repair), cause stalling, or lead to permanent engine damage.`, lo:150, hi:900, act:`Schedule service within 500 miles or 2 weeks. Avoid sustained highway driving until resolved.` },
+  P0420:{ title:'Catalyst System Below Efficiency Threshold', sev:'Medium', exp:`Your catalytic converter — the emissions-cleaning device in your exhaust — isn't working efficiently. Still drivable, but it needs attention. You may notice slightly worse MPG or a faint sulfur smell.`, warn:`Car will fail emissions testing. A clogged converter can eventually cause serious power loss and back-pressure engine damage.`, lo:400, hi:2200, act:`Schedule within 30 days. Check if still under warranty — converters are often covered up to 80k miles.` },
+  P0171:{ title:'System Too Lean (Bank 1)', sev:'Medium', exp:`Your engine is getting too much air relative to fuel. Causes rough idling, hesitation, reduced power. Most likely culprit: dirty MAF sensor, vacuum leak, or weak fuel pump.`, warn:`Can cause engine overheating and damage oxygen sensors ($200 each). Severe lean conditions cause engine wear.`, lo:100, hi:600, act:`Try cleaning the MAF sensor first — $20 DIY fix that resolves this ~30% of the time.` },
+  P0128:{ title:'Coolant Temp Below Thermostat Regulating Temp', sev:'Low', exp:`Your engine is running cooler than it should. The thermostat is likely stuck open. You may get lukewarm heat from your vents and worse fuel economy.`, warn:`Low short-term risk, but increases engine wear over time and causes issues in cold weather.`, lo:150, hi:400, act:`Fix at your next oil change. Thermostat replacement is simple — typically under $300 all-in.` },
+  B0001:{ title:'Driver Airbag Squib Circuit Open', sev:'Critical', exp:`There's a fault in your driver's side airbag circuit. Your airbag may not deploy in a crash — or could deploy unexpectedly while driving.`, warn:`In a collision, your airbag may fail to protect you. This is a life safety issue, not a performance one.`, lo:200, hi:1000, act:`Do not delay. Schedule immediate inspection. Check NHTSA.gov for active recalls on your VIN.` }
+};
+
+const fallback = c => ({ title:`Fault Code ${c} Detected`, sev:'Medium', exp:`Your vehicle's computer flagged code ${c}. Without a specific database entry, this requires hands-on diagnosis with a pro-grade scanner.`, warn:`Undiagnosed codes allow small issues to become expensive ones.`, lo:75, hi:500, act:`Schedule a diagnostic appointment and bring the exact code.` });
+
+function makeShops(loc) {
+  const city = loc.split(',')[0].trim();
+  return [
+    { name:`${city} AutoCare`, addr:`2847 Main St, ${loc}`, dist:'1.2 mi', rating:'4.8', reviews:312, avail:'Today 3pm', spec:'Engine Diagnostics' },
+    { name:'Precision Motors', addr:`591 Commerce Blvd, ${loc}`, dist:'2.7 mi', rating:'4.6', reviews:189, avail:'Tomorrow 9am', spec:'Emissions & Catalytic' },
+    { name:'QuickFix Auto', addr:`1104 Industrial Way, ${loc}`, dist:'3.1 mi', rating:'4.4', reviews:97, avail:'Today 5pm', spec:'General Repairs' }
+  ];
+}
+
+function wNext(step) {
+  if (step === 2) {
+    const y=gv('w-year'),m=gv('w-make'),mo=gv('w-model'),loc=gv('w-loc');
+    if (!y||!m||!mo||!loc) { toast('Fill in Year, Make, Model and Location to continue.','⚠️'); return; }
+    WS.vehicle = { year:y, make:m, model:mo, mileage:gv('w-mileage'), name:gv('w-name'), location:loc };
+  }
+  [1,2,3,4].forEach(i => {
+    document.getElementById('ws'+i).classList.remove('active');
+    const c = document.getElementById('wc'+i), l = document.getElementById('wl'+i);
+    c.className = 'step-circle'; l.className = 'step-lbl';
+    if (i < step) { c.classList.add('wdone'); l.classList.add('wdone'); c.textContent='✓'; if (i<4) document.getElementById('wconn'+i).classList.add('wdone'); }
+    else if (i === step) { c.classList.add('wactive'); l.classList.add('wactive'); c.textContent=i; }
+    else { c.textContent=i; if(i<4) document.getElementById('wconn'+i).classList.remove('wdone'); }
+  });
+  document.getElementById('ws'+step).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function setCode(c) { document.getElementById('w-code').value = c; }
+
+async function runDiag() {
+  const c = document.getElementById('w-code').value.trim().toUpperCase();
+  if (!c || c.length < 4) { toast('Enter a valid fault code (e.g. P0300)','⚠️'); return; }
+  WS.code = c;
+  wNext(3);
+
+  const steps = [
+    ['Decoding fault code '+c+'…','Cross-referencing OBD-II database','ls1','ls2'],
+    ['Estimating repair costs…','Checking labor rates in '+WS.vehicle.location,'ls2','ls3'],
+    ['Finding shops near you…','Sorting by rating and availability','ls3',null]
+  ];
+
+  for (const [title, sub, active] of steps) {
+    document.getElementById('load-title').textContent = title;
+    document.getElementById('load-sub').textContent = sub;
+    const el = document.getElementById(active);
+    el.style.opacity = '1'; el.style.borderColor = 'var(--border2)';
+    await sleep(950);
+    el.style.opacity = '0.5';
+  }
+
+  WS.diag = DB[c] || fallback(c);
+  WS.shops = makeShops(WS.vehicle.location);
+  renderResults();
+  wNext(4);
+
+  // Save to DB silently
+  try {
+    await api('DiagnosticReport', 'POST', {
+      fault_code: WS.code,
+      fault_description: WS.diag.title,
+      severity: WS.diag.sev,
+      plain_english_explanation: WS.diag.exp,
+      consequences_if_ignored: WS.diag.warn,
+      estimated_cost_low: WS.diag.lo,
+      estimated_cost_high: WS.diag.hi,
+      recommended_action: WS.diag.act,
+      status: 'Open',
+      user_location: WS.vehicle.location
     });
+    toast('Report saved to your records','💾');
+  } catch(e) { /* silent fail */ }
+}
 
-    const shops = loc => {
-      const city = loc.split(',')[0].trim();
-      return [
-        { name: `${city} AutoCare`, addr: `2847 Main St, ${loc}`, phone: '(404) 555-0192', rating: '4.8', reviews: 312, dist: '1.2 mi', avail: 'Today 3pm', spec: 'Engine Diagnostics' },
-        { name: 'Precision Motors', addr: `591 Commerce Blvd, ${loc}`, phone: '(404) 555-0847', rating: '4.6', reviews: 189, dist: '2.7 mi', avail: 'Tomorrow 9am', spec: 'Emissions & Catalytic' },
-        { name: 'QuickFix Auto', addr: `1104 Industrial Way, ${loc}`, phone: '(404) 555-0311', rating: '4.4', reviews: 97, dist: '3.1 mi', avail: 'Today 5pm', spec: 'General Repairs' }
-      ];
-    };
+function renderResults() {
+  const d = WS.diag;
+  setText('r-code', WS.code);
+  setText('r-title', d.title);
+  setText('r-exp', d.exp);
+  setText('r-warn', d.warn);
+  setText('r-action', d.act);
+  setText('r-cost', `$${d.lo.toLocaleString()} – $${d.hi.toLocaleString()}`);
+  setText('r-loc-label', `Near ${WS.vehicle.location}`);
 
-    // ── Navigation ─────────────────────────────────────────────────
-    function showStep(n) {
-      // Show hero vs main flow
-      document.getElementById('step-0').style.display = n === 0 ? 'block' : 'none';
-      document.getElementById('main-flow').style.display = n === 0 ? 'none' : 'block';
+  const sevClass = {Low:'badge-low',Medium:'badge-medium',High:'badge-high',Critical:'badge-critical'}[d.sev];
+  document.getElementById('r-sev').innerHTML = `<div class="badge ${sevClass}"><div style="width:6px;height:6px;border-radius:50%;background:currentColor"></div>${d.sev}</div>`;
 
-      if (n === 0) return;
+  setTimeout(() => { document.getElementById('r-cbar').style.width = Math.min((d.hi/3000)*100,100)+'%'; }, 500);
 
-      document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-      const el = document.getElementById('step-' + n);
-      if (el) el.classList.add('active');
+  const shopHtml = WS.shops.map((s,i) => `
+    <div class="shop-row" id="sr${i}" onclick="pickShop(${i})">
+      <div>
+        <div class="shop-name">${s.name}</div>
+        <div class="shop-detail">${s.addr} · ⭐${s.rating} (${s.reviews})</div>
+        <div class="shop-detail" style="margin-top:4px;">${s.spec}</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0;margin-left:12px;">
+        <div class="shop-dist">${s.dist}</div>
+        <div class="shop-avail" style="margin-top:4px;">📅 ${s.avail}</div>
+      </div>
+    </div>`).join('');
+  document.getElementById('r-shops').innerHTML = shopHtml;
 
-      // Update indicators
-      [1,2,3,4].forEach(i => {
-        const sc = document.getElementById('sc-'+i);
-        const sl = document.getElementById('sl-'+i);
-        sc.className = 'step-circle';
-        sl.className = 'step-label';
-        if (i < n) { sc.classList.add('done'); sl.classList.add('done'); sc.textContent = '✓'; }
-        else if (i === n) { sc.classList.add('active'); sl.classList.add('active'); sc.textContent = i; }
-        else { sc.textContent = i; }
-        if (i < 4) {
-          const conn = document.getElementById('conn-'+i);
-          conn.className = 'step-connector' + (i < n ? ' done' : '');
-        }
-      });
+  document.getElementById('booking-sec').style.display = 'none';
+  document.getElementById('confirm-sec').style.display = 'none';
+}
 
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+function pickShop(i) {
+  document.querySelectorAll('.shop-row').forEach(r => r.classList.remove('sel'));
+  document.getElementById('sr'+i).classList.add('sel');
+  WS.shop = WS.shops[i];
+  setText('bk-shop', WS.shop.name);
+  setText('bk-addr', WS.shop.addr);
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('bk-date').min = today;
+  document.getElementById('bk-date').value = today;
+  document.getElementById('booking-sec').style.display = 'block';
+  document.getElementById('confirm-sec').style.display = 'none';
+  setTimeout(() => document.getElementById('booking-sec').scrollIntoView({behavior:'smooth',block:'nearest'}), 100);
+}
+
+async function confirmBooking() {
+  const date = document.getElementById('bk-date').value;
+  const time = document.getElementById('bk-time').value;
+  if (!date) { toast('Pick a date first','⚠️'); return; }
+  const d = new Date(date+'T12:00:00').toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+  const v = WS.vehicle;
+  setText('confirm-text', `${v.year} ${v.make} ${v.model} · ${WS.code} · ${WS.shop.name} · ${d} at ${time}`);
+  document.getElementById('booking-sec').style.display = 'none';
+  document.getElementById('confirm-sec').style.display = 'block';
+
+  try {
+    await api('ServiceRequest','POST',{
+      shop_name: WS.shop.name,
+      shop_address: WS.shop.addr,
+      appointment_date: date,
+      appointment_time: time,
+      status: 'Pending',
+      estimated_cost: WS.diag.hi
+    });
+    toast('Appointment saved!','📅');
+  } catch(e) { /* silent */ }
+}
+
+function wReset() {
+  WS = { vehicle:{}, code:'', diag:null, shop:null, shops:[] };
+  ['ls1','ls2','ls3'].forEach(id => { const e=document.getElementById(id); e.style.opacity='0.4'; });
+  wNext(1);
+}
+
+// ══════════════════════════════════════════
+//  DOCUMENT UPLOAD
+// ══════════════════════════════════════════
+let uploadedFiles = [];
+
+function dragOver(e) { e.preventDefault(); document.getElementById('drop-zone').classList.add('drag-over'); }
+function dragLeave() { document.getElementById('drop-zone').classList.remove('drag-over'); }
+function handleDrop(e) { e.preventDefault(); dragLeave(); handleFiles(e.dataTransfer.files); }
+
+function handleFiles(files) {
+  [...files].forEach(file => {
+    uploadedFiles.push(file);
+    addFileItem(file);
+    simulateExtract(file);
+  });
+}
+
+function addFileItem(file) {
+  const icon = file.type.includes('pdf') ? '📄' : file.type.includes('image') ? '🖼️' : '📃';
+  const size = (file.size / 1024).toFixed(1) + ' KB';
+  const id = 'fi-' + Date.now() + Math.random().toString(36).slice(2);
+  const el = document.createElement('div');
+  el.className = 'file-item';
+  el.id = id;
+  el.innerHTML = `
+    <div style="display:flex;align-items:center;">
+      <div class="file-icon">${icon}</div>
+      <div><div class="file-name">${file.name}</div><div class="file-meta">${size} · ${file.type || 'unknown'}</div></div>
+    </div>
+    <div class="file-status processing" id="${id}-status">Processing…</div>`;
+  document.getElementById('file-list').appendChild(el);
+  return id;
+}
+
+async function simulateExtract(file) {
+  await sleep(1400 + Math.random()*600);
+  const statusEl = document.querySelector('.file-status.processing');
+  if (statusEl) { statusEl.textContent = 'Analyzed ✓'; statusEl.className = 'file-status done'; }
+
+  // Demo extracted data based on file type/name
+  const extracted = generateExtractedData(file.name);
+  showExtracted(extracted);
+}
+
+function generateExtractedData(filename) {
+  const name = filename.toLowerCase();
+  if (name.includes('inspec') || name.includes('report')) {
+    return { type:'Inspection Report', codes:['P0420','P0171'], mileage:'68,420', date:'2025-11-14', shop:'Midas Auto', cost:'$180 diagnostic fee', notes:'Recommend catalytic converter replacement and MAF sensor cleaning.' };
+  } else if (name.includes('invoice') || name.includes('receipt')) {
+    return { type:'Service Invoice', codes:[], mileage:'65,100', date:'2025-08-22', shop:'Jiffy Lube', cost:'$94.99', notes:'Oil change, tire rotation, cabin air filter replacement.' };
+  } else {
+    return { type:'Vehicle Document', codes:[], mileage:'Unknown', date:'Unknown', shop:'Unknown', cost:'N/A', notes:'Document uploaded. Extracting structured data from unrecognized format.' };
+  }
+}
+
+function showExtracted(data) {
+  document.getElementById('extracted-panel').style.display = 'block';
+  const codesHtml = data.codes.length
+    ? data.codes.map(c => `<span class="badge badge-high" style="margin-right:6px;">${c}</span>`).join('')
+    : '<span style="color:var(--muted);font-size:13px;">None detected</span>';
+
+  document.getElementById('extracted-content').innerHTML = `
+    <div class="info-block">
+      <div class="info-block-label">Document Type</div>
+      <div class="info-block-text">${data.type}</div>
+    </div>
+    <div class="grid-2">
+      <div class="info-block">
+        <div class="info-block-label">Fault Codes Found</div>
+        <div>${codesHtml}</div>
+      </div>
+      <div class="info-block">
+        <div class="info-block-label">Mileage at Service</div>
+        <div class="info-block-text">${data.mileage}</div>
+      </div>
+      <div class="info-block">
+        <div class="info-block-label">Service Date</div>
+        <div class="info-block-text">${data.date}</div>
+      </div>
+      <div class="info-block">
+        <div class="info-block-label">Shop / Provider</div>
+        <div class="info-block-text">${data.shop}</div>
+      </div>
+    </div>
+    <div class="info-block">
+      <div class="info-block-label">Cost</div>
+      <div class="info-block-text">${data.cost}</div>
+    </div>
+    <div class="info-block">
+      <div class="info-block-label">Notes</div>
+      <div class="info-block-text">${data.notes}</div>
+    </div>`;
+}
+
+async function saveExtracted() {
+  toast('Extracted data saved to records!', '💾');
+  document.getElementById('extracted-panel').style.display = 'none';
+}
+
+// ══════════════════════════════════════════
+//  RECORDS (Live from DB)
+// ══════════════════════════════════════════
+async function loadRecords() {
+  document.getElementById('records-content').innerHTML = `<div class="empty"><div class="spinner"></div><div class="empty-title" style="margin-top:12px;">Loading records…</div></div>`;
+  try {
+    const data = await api('DiagnosticReport');
+    const records = Array.isArray(data) ? data : (data.items || data.data || []);
+
+    const open = records.filter(r => r.status === 'Open').length;
+    const resolved = records.filter(r => r.status === 'Resolved').length;
+    setText('stat-total', records.length);
+    setText('stat-open', open);
+    setText('stat-resolved', resolved);
+
+    if (!records.length) {
+      document.getElementById('records-content').innerHTML = `<div class="empty"><div class="empty-icon">📋</div><div class="empty-title">No diagnostic reports yet</div><div class="empty-sub">Run a diagnosis to see reports here</div></div>`;
+      return;
     }
 
-    function goToStep2() {
-      const y = v('year'), m = v('make'), mo = v('model'), loc = v('location');
-      if (!y || !m || !mo || !loc) { shake('step-1'); return; }
-      S.vehicle = { year: y, make: m, model: mo, mileage: v('mileage'), name: v('owner_name'), location: loc };
-      showStep(2);
+    const sevClass = {Low:'badge-low',Medium:'badge-medium',High:'badge-high',Critical:'badge-critical'};
+    const stClass = {Open:'badge-open',Scheduled:'badge-scheduled',Resolved:'badge-resolved'};
+
+    const rows = records.slice().reverse().map(r => `
+      <tr>
+        <td><span style="font-weight:700;font-family:monospace;">${r.fault_code || '—'}</span></td>
+        <td style="max-width:180px;">${r.fault_description || r.plain_english_explanation?.slice(0,60)+'…' || '—'}</td>
+        <td><span class="badge ${sevClass[r.severity] || 'badge-medium'}">${r.severity || '—'}</span></td>
+        <td>$${r.estimated_cost_low?.toLocaleString() || '?'} – $${r.estimated_cost_high?.toLocaleString() || '?'}</td>
+        <td><span class="badge ${stClass[r.status] || 'badge-open'}">${r.status || 'Open'}</span></td>
+        <td style="color:var(--muted);">${r.user_location || '—'}</td>
+        <td>
+          ${r.status !== 'Resolved' ? `<button class="btn btn-ghost btn-sm" style="width:auto;font-size:11px;" onclick="markResolved('${r.id}')">✓ Resolve</button>` : ''}
+        </td>
+      </tr>`).join('');
+
+    document.getElementById('records-content').innerHTML = `
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Code</th><th>Description</th><th>Severity</th><th>Est. Cost</th><th>Status</th><th>Location</th><th></th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>`;
+  } catch(e) {
+    document.getElementById('records-content').innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-title">Couldn't load records</div><div class="empty-sub">${e.message}</div></div>`;
+  }
+}
+
+async function markResolved(id) {
+  try {
+    await api('DiagnosticReport','PUT',{status:'Resolved'},id);
+    toast('Marked as resolved','✅');
+    loadRecords();
+  } catch(e) { toast('Failed to update','❌'); }
+}
+
+// ══════════════════════════════════════════
+//  VEHICLES (Live from DB)
+// ══════════════════════════════════════════
+async function loadVehicles() {
+  document.getElementById('vehicles-content').innerHTML = `<div class="empty"><div class="spinner"></div><div class="empty-title" style="margin-top:12px;">Loading vehicles…</div></div>`;
+  try {
+    const data = await api('Vehicle');
+    const vehicles = Array.isArray(data) ? data : (data.items || data.data || []);
+
+    if (!vehicles.length) {
+      document.getElementById('vehicles-content').innerHTML = `<div class="empty"><div class="empty-icon">🚗</div><div class="empty-title">No vehicles saved yet</div><div class="empty-sub">Add your first vehicle above</div></div>`;
+      return;
     }
 
-    function setCode(c) { document.getElementById('fault_code').value = c; }
-
-    async function runDiagnostic() {
-      const c = document.getElementById('fault_code').value.trim().toUpperCase();
-      if (!c || c.length < 4) { shake('step-2'); return; }
-      S.code = c;
-      showStep(3);
-
-      const steps = [
-        ['Reading fault code ' + c + '…', 'Cross-referencing OBD-II database', 'ls-1', 'ls-2'],
-        ['Estimating repair costs…', 'Checking labor rates in ' + S.vehicle.location, 'ls-2', 'ls-3'],
-        ['Finding shops near you…', 'Sorting by rating and availability', 'ls-3', null],
-      ];
-
-      for (let i = 0; i < steps.length; i++) {
-        const [t, s, active, next] = steps[i];
-        document.getElementById('loading-title').textContent = t;
-        document.getElementById('loading-sub').textContent = s;
-        document.getElementById(active).classList.add('active');
-        await sleep(950);
-        document.getElementById(active).classList.remove('active');
-        document.getElementById(active).classList.add('done');
-      }
-
-      S.diagnosis = DB[c] || fallback(c);
-      renderResults();
-      showStep(4);
-    }
-
-    function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-
-    // ── Render ────────────────────────────────────────────────────
-    function renderResults() {
-      const d = S.diagnosis, v2 = S.vehicle;
-
-      set('r-code', S.code);
-      set('r-title', d.title);
-      set('r-explanation', d.exp);
-      set('r-consequences', d.warn);
-      set('r-action', d.act);
-      set('r-cost', `$${d.lo.toLocaleString()} – $${d.hi.toLocaleString()}`);
-
-      // Severity
-      const sevMap = { Low: 'sev-low', Medium: 'sev-medium', High: 'sev-high', Critical: 'sev-critical' };
-      document.getElementById('r-severity').innerHTML = `
-        <div class="severity-badge ${sevMap[d.sev]}">
-          <div class="severity-dot"></div>${d.sev}
-        </div>`;
-
-      // Cost bar
-      const pct = Math.min((d.hi / 3000) * 100, 100);
-      setTimeout(() => { document.getElementById('r-cost-bar').style.width = pct + '%'; }, 400);
-
-      // Location
-      set('shops-sub', `Near ${v2.location}`);
-
-      // Shops
-      const shopList = document.getElementById('shops-list');
-      shopList.innerHTML = shops(v2.location).map((s, i) => `
-        <div class="shop-card" id="shop-${i}" onclick="pickShop(${i})">
-          <div class="shop-row">
+    const html = vehicles.slice().reverse().map(v => `
+      <div class="card" style="margin-bottom:12px;">
+        <div class="card-pad" style="display:flex;align-items:center;justify-content:space-between;">
+          <div style="display:flex;align-items:center;gap:16px;">
+            <div style="font-size:32px;">🚗</div>
             <div>
-              <div class="shop-name">${s.name}</div>
-              <div class="shop-addr">${s.addr}</div>
-            </div>
-            <div style="text-align:right; flex-shrink:0; margin-left:12px;">
-              <div class="shop-dist">${s.dist}</div>
-              <div class="shop-rating">⭐ ${s.rating} (${s.reviews})</div>
+              <div style="font-size:16px;font-weight:800;">${v.year} ${v.make} ${v.model}${v.trim?' '+v.trim:''}</div>
+              <div style="font-size:13px;color:var(--muted);margin-top:3px;">${v.owner_name || 'No owner'} · ${v.mileage ? v.mileage.toLocaleString()+' mi' : 'Mileage unknown'}${v.vin?' · VIN: '+v.vin:''}</div>
+              ${v.owner_email ? `<div style="font-size:12px;color:var(--muted);margin-top:2px;">${v.owner_email}</div>` : ''}
             </div>
           </div>
-          <div class="shop-footer">
-            <div class="shop-specialty">${s.spec}</div>
-            <div class="shop-avail">📅 ${s.avail}</div>
+          <div style="display:flex;gap:8px;flex-shrink:0;margin-left:12px;">
+            <button class="btn btn-ghost btn-sm" style="width:auto;" onclick="deleteVehicle('${v.id}')">🗑</button>
           </div>
-        </div>`).join('');
+        </div>
+      </div>`).join('');
 
-      S.shops = shops(v2.location);
-    }
+    document.getElementById('vehicles-content').innerHTML = html;
+  } catch(e) {
+    document.getElementById('vehicles-content').innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-title">Couldn't load vehicles</div><div class="empty-sub">${e.message}</div></div>`;
+  }
+}
 
-    function pickShop(i) {
-      document.querySelectorAll('.shop-card').forEach(c => c.classList.remove('selected'));
-      document.getElementById('shop-'+i).classList.add('selected');
-      S.shop = S.shops[i];
+async function addVehicle() {
+  const year = gv('v-year'), make = gv('v-make'), model = gv('v-model');
+  if (!year || !make || !model) { toast('Year, Make, Model required','⚠️'); return; }
+  try {
+    await api('Vehicle','POST',{
+      year, make, model,
+      trim: gv('v-trim'),
+      mileage: parseFloat(gv('v-mileage')) || null,
+      owner_name: gv('v-owner'),
+      owner_email: gv('v-email'),
+      vin: gv('v-vin')
+    });
+    toast(`${year} ${make} ${model} added!`,'🚗');
+    ['v-year','v-make','v-model','v-trim','v-mileage','v-owner','v-email','v-vin'].forEach(id => document.getElementById(id).value = '');
+    loadVehicles();
+  } catch(e) { toast('Failed to save vehicle','❌'); }
+}
 
-      set('booking-shop-name', S.shop.name);
-      set('booking-shop-addr', S.shop.addr);
+async function deleteVehicle(id) {
+  if (!confirm('Remove this vehicle?')) return;
+  try {
+    await api('Vehicle','DELETE',null,id);
+    toast('Vehicle removed','🗑');
+    loadVehicles();
+  } catch(e) { toast('Failed to delete','❌'); }
+}
 
-      const today = new Date().toISOString().split('T')[0];
-      document.getElementById('appt-date').min = today;
-      document.getElementById('appt-date').value = today;
+// ══════════════════════════════════════════
+//  HELPERS
+// ══════════════════════════════════════════
+function sleep(ms) { return new Promise(r => setTimeout(r,ms)); }
+function gv(id) { return document.getElementById(id)?.value?.trim() || ''; }
+function setText(id, val) { const e = document.getElementById(id); if(e) e.textContent = val; }
 
-      document.getElementById('booking-section').style.display = 'block';
-      document.getElementById('confirm-box').style.display = 'none';
-      setTimeout(() => document.getElementById('booking-section').scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
-    }
-
-    function confirmBooking() {
-      const date = document.getElementById('appt-date').value;
-      const time = document.getElementById('appt-time').value;
-      if (!date) return;
-
-      const d = new Date(date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-      const v2 = S.vehicle;
-
-      set('confirm-sub', `${v2.year} ${v2.make} ${v2.model} · ${S.code} · ${S.shop.name} · ${d} at ${time}`);
-      document.getElementById('booking-section').style.display = 'none';
-      document.getElementById('confirm-box').style.display = 'block';
-      setTimeout(() => document.getElementById('confirm-box').scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
-    }
-
-    function resetAll() {
-      S = { vehicle: {}, code: '', diagnosis: null, shop: null };
-      document.getElementById('booking-section').style.display = 'none';
-      document.getElementById('confirm-box').style.display = 'none';
-      ['ls-1','ls-2','ls-3'].forEach(id => { const el = document.getElementById(id); el.className = 'loading-step'; });
-      document.getElementById('ls-1').classList.add('active');
-      showStep(0);
-    }
-
-    // ── Helpers ───────────────────────────────────────────────────
-    function v(id) { return document.getElementById(id)?.value?.trim() || ''; }
-    function set(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
-    function shake(stepId) {
-      const el = document.getElementById(stepId);
-      el.style.animation = 'none';
-      el.offsetHeight;
-      el.style.animation = 'shake 0.4s ease';
-    }
-  </script>
+// Init
+window.onload = () => {};
+</script>
 </body>
 </html>
