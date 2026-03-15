@@ -297,8 +297,8 @@
         <div style="font-size:17px;font-weight:700;margin-bottom:8px;" id="load-title">Decoding fault code…</div>
         <div style="font-size:13px;color:var(--muted);" id="load-sub">Cross-referencing OBD-II database</div>
         <div style="margin-top:24px;display:flex;flex-direction:column;gap:8px;text-align:left;">
-          <div class="info-block" id="ls1" style="opacity:0.4;transition:all 0.3s;display:flex;align-items:center;gap:10px;">🤖 <span>Sending to AutoDoctor AI (GPT-4o)</span></div>
-          <div class="info-block" id="ls2" style="opacity:0.4;transition:all 0.3s;display:flex;align-items:center;gap:10px;">🔍 <span>Analyzing fault code &amp; severity</span></div>
+          <div class="info-block" id="ls1" style="opacity:0.4;transition:all 0.3s;display:flex;align-items:center;gap:10px;">🔍 <span>Reading fault code database</span></div>
+          <div class="info-block" id="ls2" style="opacity:0.4;transition:all 0.3s;display:flex;align-items:center;gap:10px;">💰 <span>Estimating repair costs</span></div>
           <div class="info-block" id="ls3" style="opacity:0.4;transition:all 0.3s;display:flex;align-items:center;gap:10px;">📍 <span>Finding shops near you</span></div>
         </div>
       </div>
@@ -340,9 +340,6 @@
           </div>
         </div>
       </div>
-      <!-- AI Insights -->
-      <div class="result-section" id="r-ai-extras" style="display:none;padding:16px 20px;background:rgba(249,115,22,0.04);border:1px solid rgba(249,115,22,0.15);border-radius:14px;margin-bottom:4px;"></div>
-
       <!-- Shops -->
       <div class="result-section">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
@@ -585,61 +582,27 @@ async function runDiag() {
   WS.code = c;
   wNext(3);
 
-  // Step 1 — animate loading steps
   const steps = [
-    ['Sending code to AutoDoctor AI…','Powered by GPT-4o','ls1'],
-    ['Analyzing fault code '+c+'…','Checking severity, parts & costs','ls2'],
-    ['Building your report…','Finding shops near '+WS.vehicle.location,'ls3']
+    ['Decoding fault code '+c+'…','Cross-referencing OBD-II database','ls1','ls2'],
+    ['Estimating repair costs…','Checking labor rates in '+WS.vehicle.location,'ls2','ls3'],
+    ['Finding shops near you…','Sorting by rating and availability','ls3',null]
   ];
+
   for (const [title, sub, active] of steps) {
     document.getElementById('load-title').textContent = title;
     document.getElementById('load-sub').textContent = sub;
     const el = document.getElementById(active);
-    el.style.opacity = '1'; el.style.borderColor = 'var(--orange)';
-    await sleep(900);
-    el.style.opacity = '0.5'; el.style.borderColor = 'var(--border2)';
+    el.style.opacity = '1'; el.style.borderColor = 'var(--border2)';
+    await sleep(950);
+    el.style.opacity = '0.5';
   }
 
-  // Step 2 — call GPT-4o backend
-  try {
-    const res = await fetch('/functions/interpretFaultCode', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        fault_code: c,
-        year: WS.vehicle.year,
-        make: WS.vehicle.make,
-        model: WS.vehicle.model,
-        mileage: WS.vehicle.mileage
-      })
-    });
-    const json = await res.json();
-    if (json.success && json.diagnosis) {
-      const d = json.diagnosis;
-      WS.diag = {
-        title: d.fault_description,
-        sev: d.severity,
-        exp: d.plain_english_explanation,
-        warn: d.consequences_if_ignored,
-        lo: d.estimated_cost_low,
-        hi: d.estimated_cost_high,
-        act: d.recommended_action,
-        parts: d.parts_likely_involved || [],
-        diy: d.diy_possible,
-        shopHours: d.shop_time_hours
-      };
-    } else {
-      WS.diag = DB[c] || fallback(c);
-    }
-  } catch(e) {
-    WS.diag = DB[c] || fallback(c);
-  }
-
+  WS.diag = DB[c] || fallback(c);
   WS.shops = makeShops(WS.vehicle.location);
   renderResults();
   wNext(4);
 
-  // Step 3 — save to DB silently
+  // Save to DB silently
   try {
     await api('DiagnosticReport', 'POST', {
       fault_code: WS.code,
@@ -653,7 +616,7 @@ async function runDiag() {
       status: 'Open',
       user_location: WS.vehicle.location
     });
-    toast('AI Report saved to your records ✓','💾');
+    toast('Report saved to your records','💾');
   } catch(e) { /* silent fail */ }
 }
 
@@ -671,22 +634,6 @@ function renderResults() {
   document.getElementById('r-sev').innerHTML = `<div class="badge ${sevClass}"><div style="width:6px;height:6px;border-radius:50%;background:currentColor"></div>${d.sev}</div>`;
 
   setTimeout(() => { document.getElementById('r-cbar').style.width = Math.min((d.hi/3000)*100,100)+'%'; }, 500);
-
-  // AI-powered extras: parts + DIY flag
-  const aiExtras = document.getElementById('r-ai-extras');
-  if (aiExtras) {
-    const partsHtml = d.parts && d.parts.length
-      ? d.parts.map(p => `<span style="background:rgba(249,115,22,0.1);border:1px solid rgba(249,115,22,0.25);color:#fb923c;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;">${p}</span>`).join(' ')
-      : '';
-    const diyHtml = d.diy !== undefined
-      ? `<span style="background:${d.diy ? 'rgba(74,222,128,0.1)' : 'rgba(248,113,113,0.1)'};border:1px solid ${d.diy ? 'rgba(74,222,128,0.25)' : 'rgba(248,113,113,0.25)'};color:${d.diy ? '#4ade80' : '#f87171'};font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;">${d.diy ? '🔧 DIY Possible' : '🏠 Shop Recommended'}</span>`
-      : '';
-    const hoursHtml = d.shopHours ? `<span style="background:rgba(96,165,250,0.1);border:1px solid rgba(96,165,250,0.25);color:#60a5fa;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;">⏱ ${d.shopHours}h shop time</span>` : '';
-    aiExtras.innerHTML = `
-      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#666;margin-bottom:8px;">AI Insights</div>
-      <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">${partsHtml} ${diyHtml} ${hoursHtml}</div>`;
-    aiExtras.style.display = 'block';
-  }
 
   const shopHtml = WS.shops.map((s,i) => `
     <div class="shop-row" id="sr${i}" onclick="pickShop(${i})">
