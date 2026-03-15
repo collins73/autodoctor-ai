@@ -30,11 +30,13 @@ Respond ONLY with a valid JSON object in this exact format:
   "shop_time_hours": 1.5
 }`;
 
+    const apiKey = Deno.env.get("OPENAI_API_KEY");
+
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${Deno.env.get("OPENAI_API_KEY")}`,
+        "Authorization": `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
         model: "gpt-4o",
@@ -45,7 +47,20 @@ Respond ONLY with a valid JSON object in this exact format:
       }),
     });
 
-    const data = await response.json();
+    const raw = await response.text();
+
+    // Debug: return raw response if something goes wrong
+    let data;
+    try {
+      data = JSON.parse(raw);
+    } catch {
+      return Response.json({ error: "Failed to parse OpenAI response", raw }, { status: 500 });
+    }
+
+    if (!data.choices || !data.choices[0]) {
+      return Response.json({ error: "Unexpected OpenAI response", data }, { status: 500 });
+    }
+
     const result = JSON.parse(data.choices[0].message.content);
     return Response.json({ success: true, diagnosis: result });
 
