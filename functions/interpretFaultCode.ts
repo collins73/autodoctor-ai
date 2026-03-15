@@ -30,7 +30,7 @@ Respond ONLY with a valid JSON object in this exact format:
   "shop_time_hours": 1.5
 }`;
 
-    const apiKey = Deno.env.get("OPENAI_API_KEY");
+    const apiKey = Deno.env.get("OPENAI_KEY");
 
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -49,7 +49,6 @@ Respond ONLY with a valid JSON object in this exact format:
 
     const raw = await response.text();
 
-    // Debug: return raw response if something goes wrong
     let data;
     try {
       data = JSON.parse(raw);
