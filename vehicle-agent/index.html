@@ -191,6 +191,36 @@
     /* Animated fade */
     .fade-up { animation:fadeUp 0.3s ease both; }
     @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+    /* Trial banner */
+    .trial-banner { display:flex; align-items:center; justify-content:space-between; background:rgba(249,115,22,0.08); border:1px solid rgba(249,115,22,0.25); border-radius:12px; padding:12px 16px; margin-bottom:16px; gap:12px; flex-wrap:wrap; }
+    .trial-pips { display:flex; gap:5px; }
+    .trial-pip { width:28px; height:6px; border-radius:3px; background:var(--border2); transition:background 0.3s; }
+    .trial-pip.used { background:var(--orange); }
+    .trial-pip.last { background:#ef4444; }
+    .trial-text { font-size:13px; font-weight:600; color:var(--orange); }
+    .trial-sub { font-size:11px; color:var(--muted); margin-top:2px; }
+
+    /* Paywall overlay */
+    .paywall { display:none; position:fixed; inset:0; z-index:100; background:rgba(0,0,0,0.85); backdrop-filter:blur(12px); align-items:center; justify-content:center; padding:20px; }
+    .paywall.show { display:flex; }
+    .paywall-card { background:var(--surface); border:1px solid var(--border2); border-radius:24px; padding:36px 28px; max-width:420px; width:100%; text-align:center; }
+    .paywall-icon { font-size:48px; margin-bottom:16px; }
+    .paywall-title { font-size:22px; font-weight:800; margin-bottom:8px; letter-spacing:-0.5px; }
+    .paywall-sub { font-size:14px; color:var(--muted); line-height:1.6; margin-bottom:24px; }
+    .paywall-price { font-size:36px; font-weight:900; color:var(--orange); margin-bottom:4px; }
+    .paywall-price-sub { font-size:13px; color:var(--muted); margin-bottom:24px; }
+    .paywall-features { text-align:left; margin-bottom:24px; display:flex; flex-direction:column; gap:8px; }
+    .paywall-feature { display:flex; align-items:center; gap:10px; font-size:14px; color:#ccc; }
+    .paywall-feature-icon { width:20px; height:20px; background:rgba(74,222,128,0.12); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; flex-shrink:0; }
+
+    /* Feedback modal */
+    .feedback-modal { display:none; position:fixed; inset:0; z-index:100; background:rgba(0,0,0,0.85); backdrop-filter:blur(12px); align-items:center; justify-content:center; padding:20px; }
+    .feedback-modal.show { display:flex; }
+    .feedback-card { background:var(--surface); border:1px solid var(--border2); border-radius:24px; padding:32px 28px; max-width:420px; width:100%; }
+    .star-row { display:flex; gap:8px; justify-content:center; margin:16px 0; }
+    .star { font-size:28px; cursor:pointer; opacity:0.3; transition:opacity 0.15s,transform 0.15s; }
+    .star.active { opacity:1; transform:scale(1.1); }
   </style>
 </head>
 <body>
@@ -550,13 +580,43 @@ const DB = {
 
 const fallback = c => ({ title:`Fault Code ${c} Detected`, sev:'Medium', exp:`Your vehicle's computer flagged code ${c}. Without a specific database entry, this requires hands-on diagnosis with a pro-grade scanner.`, warn:`Undiagnosed codes allow small issues to become expensive ones.`, lo:75, hi:500, act:`Schedule a diagnostic appointment and bring the exact code.` });
 
-function makeShops(loc) {
-  const city = loc.split(',')[0].trim();
-  return [
-    { name:`${city} AutoCare`, addr:`2847 Main St, ${loc}`, dist:'1.2 mi', rating:'4.8', reviews:312, avail:'Today 3pm', spec:'Engine Diagnostics' },
-    { name:'Precision Motors', addr:`591 Commerce Blvd, ${loc}`, dist:'2.7 mi', rating:'4.6', reviews:189, avail:'Tomorrow 9am', spec:'Emissions & Catalytic' },
-    { name:'QuickFix Auto', addr:`1104 Industrial Way, ${loc}`, dist:'3.1 mi', rating:'4.4', reviews:97, avail:'Today 5pm', spec:'General Repairs' }
-  ];
+async function fetchNearbyShops(latitude, longitude) {
+  try {
+    const res = await fetch('/functions/findNearbyShops', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ latitude, longitude, radius: 10000 })
+    });
+    const json = await res.json();
+    if (json.success && json.shops) {
+      return json.shops.map(s => ({
+        name: s.name,
+        addr: s.address,
+        dist: s.distance_miles ? s.distance_miles + ' mi' : '—',
+        rating: s.rating ? s.rating.toString() : 'N/A',
+        reviews: s.total_ratings || 0,
+        avail: s.is_open === true ? '🟢 Open Now' : s.is_open === false ? '🔴 Closed' : '—',
+        spec: s.types.includes('auto_parts_store') ? 'Auto Parts & Repair' : 'Auto Repair',
+        phone: s.phone || null,
+        website: s.website || null
+      }));
+    }
+  } catch(e) { console.warn('Shop fetch failed:', e); }
+  return [];
+}
+
+async function getLocationAndShops() {
+  return new Promise((resolve) => {
+    if (!navigator.geolocation) { resolve([]); return; }
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const shops = await fetchNearbyShops(pos.coords.latitude, pos.coords.longitude);
+        resolve(shops);
+      },
+      () => resolve([]),
+      { timeout: 8000 }
+    );
+  });
 }
 
 function wNext(step) {
@@ -602,6 +662,9 @@ async function runDiag() {
 
   // Step 2 — call GPT-4o backend
   try {
+    // Block if trial exhausted
+    if (TRIAL.exhausted) { showPaywall(); wNext(1); return; }
+
     const res = await fetch('/functions/interpretFaultCode', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -614,6 +677,13 @@ async function runDiag() {
       })
     });
     const json = await res.json();
+    if (json.error === 'trial_exhausted') {
+      TRIAL.exhausted = true;
+      updateTrialBanner(5, 5, 0);
+      showPaywall();
+      wNext(1);
+      return;
+    }
     if (json.success && json.diagnosis) {
       const d = json.diagnosis;
       WS.diag = {
@@ -628,6 +698,14 @@ async function runDiag() {
         diy: d.diy_possible,
         shopHours: d.shop_time_hours
       };
+      if (json.trial_info) {
+        TRIAL.remaining = json.trial_info.remaining;
+        TRIAL.exhausted = json.trial_info.trial_exhausted;
+        updateTrialBanner(json.trial_info.diagnosis_count, json.trial_info.trial_limit, json.trial_info.remaining);
+        if (json.trial_info.remaining === 0 && !TRIAL.feedbackSubmitted) {
+          setTimeout(() => showFeedback(), 2500);
+        }
+      }
     } else {
       WS.diag = DB[c] || fallback(c);
     }
@@ -635,8 +713,13 @@ async function runDiag() {
     WS.diag = DB[c] || fallback(c);
   }
 
-  WS.shops = makeShops(WS.vehicle.location);
-  renderResults();
+  // Fetch real nearby shops via Google Maps
+  document.getElementById('r-shops').innerHTML = '<div style="padding:20px;text-align:center;color:#666;font-size:13px;"><div class="spinner" style="margin:0 auto 10px;"></div>Finding shops near you…</div>';
+  wNext(4);
+  getLocationAndShops().then(shops => {
+    WS.shops = shops;
+    renderResults();
+  });
   wNext(4);
 
   // Step 3 — save to DB silently
@@ -688,16 +771,24 @@ function renderResults() {
     aiExtras.style.display = 'block';
   }
 
+  if (!WS.shops || WS.shops.length === 0) {
+    document.getElementById('r-shops').innerHTML = '<div class="empty"><div class="empty-icon">🔍</div><div class="empty-title">No shops found nearby</div><div class="empty-sub">Try searching manually or expanding your location.</div></div>';
+    return;
+  }
   const shopHtml = WS.shops.map((s,i) => `
     <div class="shop-row" id="sr${i}" onclick="pickShop(${i})">
-      <div>
+      <div style="flex:1;min-width:0;">
         <div class="shop-name">${s.name}</div>
-        <div class="shop-detail">${s.addr} · ⭐${s.rating} (${s.reviews})</div>
-        <div class="shop-detail" style="margin-top:4px;">${s.spec}</div>
+        <div class="shop-detail">${s.addr}</div>
+        <div class="shop-detail" style="margin-top:4px;display:flex;gap:8px;flex-wrap:wrap;">
+          ${s.rating !== 'N/A' ? `<span>⭐ ${s.rating} (${s.reviews})</span>` : ''}
+          ${s.phone ? `<span>📞 ${s.phone}</span>` : ''}
+          ${s.website ? `<a href="${s.website}" target="_blank" onclick="event.stopPropagation()" style="color:var(--orange);text-decoration:none;">🌐 Website</a>` : ''}
+        </div>
       </div>
       <div style="text-align:right;flex-shrink:0;margin-left:12px;">
         <div class="shop-dist">${s.dist}</div>
-        <div class="shop-avail" style="margin-top:4px;">📅 ${s.avail}</div>
+        <div class="shop-avail" style="margin-top:4px;">${s.avail}</div>
       </div>
     </div>`).join('');
   document.getElementById('r-shops').innerHTML = shopHtml;
@@ -977,6 +1068,157 @@ function setText(id, val) { const e = document.getElementById(id); if(e) e.textC
 
 // Init
 window.onload = () => {};
+
+// ══════════════════════════════════════════
+//  TRIAL & PAYWALL
+// ══════════════════════════════════════════
+let TRIAL = { remaining: 5, exhausted: false, feedbackSubmitted: false };
+let selectedRating = 5;
+
+async function loadTrialStatus() {
+  try {
+    const res = await fetch('/functions/checkTrialStatus', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+    const json = await res.json();
+    if (json.success) {
+      TRIAL = { remaining: json.remaining, exhausted: json.trial_exhausted, feedbackSubmitted: json.feedback_submitted };
+      updateTrialBanner(json.diagnosis_count, json.trial_limit, json.remaining);
+    }
+  } catch(e) { /* silent */ }
+}
+
+function updateTrialBanner(used, limit, remaining) {
+  const banner = document.getElementById('trial-banner');
+  const text = document.getElementById('trial-text');
+  if (!banner) return;
+  banner.style.display = 'flex';
+  text.textContent = remaining === 0 ? 'Trial complete — upgrade to continue' : `${remaining} free ${remaining === 1 ? 'diagnosis' : 'diagnoses'} remaining`;
+  text.style.color = remaining <= 1 ? '#ef4444' : 'var(--orange)';
+  for (let i = 0; i < limit; i++) {
+    const pip = document.getElementById('tp'+i);
+    if (!pip) continue;
+    pip.className = 'trial-pip';
+    if (i < used) pip.classList.add(i === limit - 1 ? 'last' : 'used');
+  }
+}
+
+function showPaywall() { document.getElementById('paywall').classList.add('show'); }
+
+// DEBUG: add ?paywall=1 to URL to force paywall open (dev only)
+(function() {
+  if (new URLSearchParams(window.location.search).get('paywall') === '1') {
+    window.addEventListener('load', () => {
+      TRIAL.exhausted = true;
+      showPaywall();
+    });
+  }
+})();
+function hidePaywall() { document.getElementById('paywall').classList.remove('show'); }
+function showFeedback() { hidePaywall(); document.getElementById('feedback-modal').classList.add('show'); }
+function closeFeedback() { document.getElementById('feedback-modal').classList.remove('show'); }
+
+function setRating(r) {
+  selectedRating = r;
+  document.querySelectorAll('.star').forEach((s, i) => s.classList.toggle('active', i < r));
+}
+
+async function submitFeedbackForm() {
+  const text = document.getElementById('feedback-text').value.trim();
+  if (!text) { toast('Please share your thoughts first ✍️', '⚠️'); return; }
+  try {
+    const res = await fetch('/functions/submitFeedback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ feedback: text, rating: selectedRating })
+    });
+    const json = await res.json();
+    if (json.success) {
+      closeFeedback();
+      toast('Thanks for the feedback! 🙏 We\'ll use it to improve.', '✅');
+      TRIAL.feedbackSubmitted = true;
+    }
+  } catch(e) { toast('Could not submit. Try again.', '⚠️'); }
+}
+
+async function handleUpgrade() {
+  const btn = document.querySelector('#paywall .btn-primary');
+  if (btn) { btn.textContent = '⏳ Loading checkout…'; btn.disabled = true; }
+  try {
+    const res = await fetch('/functions/createCheckout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: '{}'
+    });
+    const json = await res.json();
+    if (json.url) {
+      window.location.href = json.url;
+    } else {
+      toast('Could not start checkout. Try again.', '⚠️');
+      if (btn) { btn.textContent = '⚡ Upgrade Now'; btn.disabled = false; }
+    }
+  } catch(e) {
+    toast('Could not start checkout. Try again.', '⚠️');
+    if (btn) { btn.textContent = '⚡ Upgrade Now'; btn.disabled = false; }
+  }
+}
+
+loadTrialStatus();
+setRating(5);
+
+// Handle post-checkout redirect
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('upgraded') === 'true') {
+    toast('🎉 You\'re now unlimited! Welcome to the full experience.', '✅');
+    TRIAL.exhausted = false;
+    loadTrialStatus();
+    window.history.replaceState({}, '', window.location.pathname);
+  } else if (params.get('upgraded') === 'false') {
+    toast('Checkout cancelled — your trial is still active.', 'ℹ️');
+    window.history.replaceState({}, '', window.location.pathname);
+  }
+})();
+
 </script>
+
+  <!-- Paywall Modal -->
+  <div class="paywall" id="paywall">
+    <div class="paywall-card">
+      <div class="paywall-icon">🔒</div>
+      <div class="paywall-title grad-text">Trial Complete</div>
+      <div class="paywall-sub">You've used all 5 free diagnoses. Upgrade to keep your car running at its best.</div>
+      <div class="paywall-price">$9.99<span style="font-size:16px;color:var(--muted)">/mo</span></div>
+      <div class="paywall-price-sub">Unlimited diagnoses · Cancel anytime</div>
+      <div class="paywall-features">
+        <div class="paywall-feature"><div class="paywall-feature-icon">✓</div> Unlimited AI diagnostics</div>
+        <div class="paywall-feature"><div class="paywall-feature-icon">✓</div> Real-time nearby shop finder</div>
+        <div class="paywall-feature"><div class="paywall-feature-icon">✓</div> Full diagnostic history</div>
+        <div class="paywall-feature"><div class="paywall-feature-icon">✓</div> Service appointment booking</div>
+      </div>
+      <button class="btn btn-primary" onclick="handleUpgrade()" style="margin-bottom:12px;">⚡ Upgrade Now</button>
+      <button class="btn btn-ghost" style="width:100%;font-size:13px;" onclick="showFeedback()">Give feedback instead →</button>
+    </div>
+  </div>
+
+  <!-- Feedback Modal -->
+  <div class="feedback-modal" id="feedback-modal">
+    <div class="feedback-card">
+      <div style="font-size:28px;text-align:center;margin-bottom:8px;">💬</div>
+      <div style="font-size:20px;font-weight:800;text-align:center;margin-bottom:6px;letter-spacing:-0.3px;">How was your trial?</div>
+      <div style="font-size:13px;color:var(--muted);text-align:center;margin-bottom:4px;">Your feedback shapes the product.</div>
+      <div class="star-row" id="star-row">
+        <span class="star" onclick="setRating(1)">★</span>
+        <span class="star" onclick="setRating(2)">★</span>
+        <span class="star" onclick="setRating(3)">★</span>
+        <span class="star" onclick="setRating(4)">★</span>
+        <span class="star" onclick="setRating(5)">★</span>
+      </div>
+      <div class="field" style="margin-top:12px;">
+        <label class="field-label">What did you think?</label>
+        <textarea class="input" id="feedback-text" rows="4" placeholder="Tell us what worked, what didn't, and what you'd love to see…"></textarea>
+      </div>
+      <button class="btn btn-primary" onclick="submitFeedbackForm()" style="margin-bottom:10px;">Submit Feedback</button>
+      <button class="btn btn-ghost" style="width:100%;font-size:13px;" onclick="closeFeedback()">Maybe later</button>
+    </div>
+  </div>
 </body>
 </html>
