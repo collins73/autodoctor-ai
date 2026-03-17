@@ -1,11 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
+import { createClient } from '@base44/sdk';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import UpcomingService from '@/components/dashboard/UpcomingService';
 
 const FUNCTIONS_BASE = 'https://rebel-ai-36e8d1bc.base44.app/functions';
+
+async function callFunction(path, method = 'GET', body = null) {
+  const token = base44.auth?.token || base44._token || localStorage.getItem('base44_token') || '';
+  const opts = {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+  };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(`${FUNCTIONS_BASE}/${path}`, opts);
+  return res.json();
+}
 
 export default function Dashboard() {
   const [trialInfo, setTrialInfo] = useState(null);
@@ -16,17 +31,16 @@ export default function Dashboard() {
     queryKey: ['vehicles'],
     queryFn: async () => { try { return await base44.entities.Vehicle.list('-created_date'); } catch { return []; } },
   });
-  const { data: sessions = [] } = useQuery({
-    queryKey: ['diagnostic-sessions'],
-    queryFn: async () => { try { return await base44.entities.DiagnosticSession.list('-created_date', 10); } catch { return []; } },
+  const { data: reports = [] } = useQuery({
+    queryKey: ['diagnostic-reports'],
+    queryFn: async () => { try { return await base44.entities.DiagnosticReport.list('-created_date', 10); } catch { return []; } },
   });
 
-  const open = sessions.filter(s => s.status === 'active').length;
-  const resolved = sessions.filter(s => s.status === 'resolved').length;
+  const open = reports.filter(s => s.status === 'Open').length;
+  const resolved = reports.filter(s => s.status === 'Resolved').length;
 
   useEffect(() => {
     fetchTrialStatus();
-    // Check for upgrade success
     const params = new URLSearchParams(window.location.search);
     if (params.get('upgraded') === 'true') {
       setShowSuccess(true);
@@ -37,11 +51,7 @@ export default function Dashboard() {
 
   async function fetchTrialStatus() {
     try {
-      const token = await base44.auth.token();
-      const res = await fetch(`${FUNCTIONS_BASE}/checkTrialStatus`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
+      const data = await callFunction('checkTrialStatus');
       setTrialInfo(data);
     } catch (e) {
       console.error('Trial check failed', e);
@@ -51,15 +61,16 @@ export default function Dashboard() {
   async function handleUpgrade() {
     setUpgrading(true);
     try {
-      const token = await base44.auth.token();
-      const res = await fetch(`${FUNCTIONS_BASE}/createCheckout`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-      });
-      const data = await res.json();
-      if (data.url) window.location.href = data.url;
+      const data = await callFunction('createCheckout', 'POST', {});
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        console.error('No checkout URL:', data);
+        alert('Checkout failed: ' + (data.error || 'Unknown error'));
+      }
     } catch (e) {
       console.error('Upgrade failed', e);
+      alert('Upgrade failed. Please try again.');
     }
     setUpgrading(false);
   }
@@ -128,7 +139,8 @@ export default function Dashboard() {
         <p style={{ fontSize: 13, color: '#666', marginTop: 4 }}>Overview of your vehicles and diagnostics</p>
       </motion.div>
 
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} style={{ background: 'linear-gradient(135deg,rgba(124,58,237,0.15),rgba(168,85,247,0.08))', border: '1px solid rgba(168,85,247,0.35)', borderRadius: 16, padding: '16px 20px', marginBottom: 20, display: 'flex', alignItems: 'flex-start', gap: 14 }}>
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+        style={{ background: 'linear-gradient(135deg,rgba(124,58,237,0.15),rgba(168,85,247,0.08))', border: '1px solid rgba(168,85,247,0.35)', borderRadius: 16, padding: '16px 20px', marginBottom: 20, display: 'flex', alignItems: 'flex-start', gap: 14 }}>
         <span style={{ fontSize: 28, flexShrink: 0 }}>🔧</span>
         <div>
           <div style={{ fontSize: 14, fontWeight: 700, color: '#e2d9f3', marginBottom: 2 }}>Welcome to Rebel Auto Agent</div>
@@ -161,58 +173,29 @@ export default function Dashboard() {
           <div style={{ fontSize: 15, fontWeight: 700 }}>Recent Diagnostics</div>
           <Link to="/History" style={{ fontSize: 12, color: '#c084fc', textDecoration: 'none', fontWeight: 600 }}>View all →</Link>
         </div>
-        {sessions.length === 0 ? (
+        {reports.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '40px 24px', color: '#666' }}>
             <div style={{ fontSize: 32, marginBottom: 10, opacity: 0.4 }}>📋</div>
             <div style={{ fontSize: 14, color: '#333', marginBottom: 6 }}>No diagnostics yet</div>
             <Link to="/Diagnose" style={{ fontSize: 13, color: '#c084fc', textDecoration: 'none', fontWeight: 600 }}>Start your first diagnosis →</Link>
           </div>
         ) : (
-          sessions.slice(0, 5).map(s => {
-            const sevColors = { low: '#4ade80', medium: '#fbbf24', high: '#fb923c', critical: '#f87171' };
+          reports.slice(0, 5).map(r => {
+            const sevColors = { Low: '#4ade80', Medium: '#fbbf24', High: '#fb923c', Critical: '#f87171' };
             return (
-              <div key={s.id} style={{ padding: '14px 20px', borderBottom: '1px solid #231849', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+              <div key={r.id} style={{ padding: '14px 20px', borderBottom: '1px solid #231849', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
                 <div style={{ minWidth: 0 }}>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: '#f0eeff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.title}</div>
-                  {s.vehicle_summary && <div style={{ fontSize: 12, color: '#666', marginTop: 2 }}>{s.vehicle_summary}</div>}
+                  <div style={{ fontSize: 14, fontWeight: 600, color: '#f0eeff' }}>{r.fault_code} — {r.fault_description || 'Diagnostic Report'}</div>
+                  {r.plain_english_explanation && <div style={{ fontSize: 12, color: '#666', marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{r.plain_english_explanation}</div>}
                 </div>
-                {s.severity && (
-                  <span style={{ fontSize: 11, fontWeight: 700, color: sevColors[s.severity] || '#fbbf24', background: `${sevColors[s.severity] || '#fbbf24'}15`, border: `1px solid ${sevColors[s.severity] || '#fbbf24'}40`, borderRadius: 20, padding: '2px 10px', whiteSpace: 'nowrap', flexShrink: 0 }}>
-                    {s.severity.charAt(0).toUpperCase() + s.severity.slice(1)}
+                {r.severity && (
+                  <span style={{ fontSize: 11, fontWeight: 700, color: sevColors[r.severity] || '#fbbf24', background: `${sevColors[r.severity] || '#fbbf24'}15`, border: `1px solid ${sevColors[r.severity] || '#fbbf24'}40`, borderRadius: 20, padding: '2px 10px', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                    {r.severity}
                   </span>
                 )}
               </div>
             );
           })
-        )}
-      </div>
-
-      {/* Vehicles */}
-      <div style={{ background: '#18122b', border: '1px solid #2a1f4a', borderRadius: 20, overflow: 'hidden' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '18px 20px', borderBottom: '1px solid #2a1f4a' }}>
-          <div style={{ fontSize: 15, fontWeight: 700 }}>Your Vehicles</div>
-          <Link to="/Vehicles" style={{ fontSize: 12, color: '#c084fc', textDecoration: 'none', fontWeight: 600 }}>Manage →</Link>
-        </div>
-        {vehicles.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '40px 24px', color: '#666' }}>
-            <div style={{ fontSize: 32, marginBottom: 10, opacity: 0.4 }}>🚗</div>
-            <div style={{ fontSize: 14, color: '#333', marginBottom: 6 }}>No vehicles added</div>
-            <Link to="/Vehicles" style={{ fontSize: 13, color: '#c084fc', textDecoration: 'none', fontWeight: 600 }}>Add your first vehicle →</Link>
-          </div>
-        ) : (
-          vehicles.slice(0, 5).map(v => (
-            <div key={v.id} style={{ padding: '14px 20px', borderBottom: '1px solid #231849', display: 'flex', alignItems: 'center', gap: 14 }}>
-              {v.image_url ? (
-                <img src={v.image_url} alt={`${v.make} ${v.model}`} style={{ width: 44, height: 44, objectFit: 'cover', borderRadius: 10, border: '1px solid #2a1f4a', flexShrink: 0 }} />
-              ) : (
-                <div style={{ fontSize: 26 }}>🚗</div>
-              )}
-              <div>
-                <div style={{ fontSize: 14, fontWeight: 700 }}>{v.year} {v.make} {v.model}</div>
-                <div style={{ fontSize: 12, color: '#666', marginTop: 2 }}>{v.mileage ? v.mileage.toLocaleString() + ' mi' : 'No mileage recorded'}</div>
-              </div>
-            </div>
-          ))
         )}
       </div>
     </div>
