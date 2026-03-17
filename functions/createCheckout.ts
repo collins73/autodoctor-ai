@@ -1,6 +1,6 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.20';
 
-const STRIPE_SECRET_KEY = Deno.env.get('STRIPE_TEST_SECRET_KEY') || Deno.env.get('STRIPE_SECRET_KEY') || '';
+const STRIPE_SECRET_KEY = Deno.env.get('STRIPE_SECRET_KEY') || '';
 const APP_URL = 'https://rebelauto-diagnostics-ai.base44.app';
 
 Deno.serve(async (req) => {
@@ -9,6 +9,10 @@ Deno.serve(async (req) => {
     const user = await base44.auth.me();
     if (!user) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    if (!STRIPE_SECRET_KEY) {
+      return Response.json({ error: 'Stripe not configured' }, { status: 500 });
     }
 
     const body = new URLSearchParams();
