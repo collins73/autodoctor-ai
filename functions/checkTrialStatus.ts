@@ -10,15 +10,35 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Get user record
-    const users = await base44.asServiceRole.entities.User.filter({ id: user.id });
-    const userRecord = users[0] || {};
+    // Admin users are always Pro
+    if (user.role === 'admin') {
+      return Response.json({
+        success: true,
+        diagnosis_count: 0,
+        trial_limit: TRIAL_LIMIT,
+        remaining: 999,
+        trial_exhausted: false,
+        subscription_status: 'active',
+        feedback_submitted: false,
+        can_diagnose: true,
+      });
+    }
 
-    const diagnosisCount = userRecord.diagnosis_count || 0;
-    const subscriptionStatus = userRecord.subscription_status || 'trial';
-    const trialExhausted = diagnosisCount >= TRIAL_LIMIT;
+    // Try to find user record by email
+    let userRecord: any = null;
+    try {
+      const users = await base44.asServiceRole.entities.User.filter({ email: user.email });
+      userRecord = users[0] || null;
+    } catch {
+      userRecord = null;
+    }
+
+    // If no record, treat as fresh trial
+    const diagnosisCount = userRecord?.diagnosis_count || 0;
+    const subscriptionStatus = userRecord?.subscription_status || 'trial';
+    const trialExhausted = subscriptionStatus !== 'active' && diagnosisCount >= TRIAL_LIMIT;
     const remaining = Math.max(0, TRIAL_LIMIT - diagnosisCount);
-    const feedbackSubmitted = userRecord.feedback_submitted || false;
+    const feedbackSubmitted = userRecord?.feedback_submitted || false;
 
     return Response.json({
       success: true,
@@ -30,7 +50,7 @@ Deno.serve(async (req) => {
       feedback_submitted: feedbackSubmitted,
       can_diagnose: subscriptionStatus === 'active' || !trialExhausted,
     });
-  } catch (error) {
+  } catch (error: any) {
     return Response.json({ error: error.message }, { status: 500 });
   }
 });
