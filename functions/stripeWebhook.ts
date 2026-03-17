@@ -1,7 +1,6 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.20';
 
-const STRIPE_SECRET_KEY = Deno.env.get('STRIPE_SECRET_KEY') || '';
-const WEBHOOK_SECRET = (Deno.env.get('STRIPE_WEBHOOK_SECRET') || '').trim();
+const WEBHOOK_SECRET = Deno.env.get('STRIPE_WEBHOOK_SECRET') || 'whsec_qmMXYU2cwbMNypC0Cho23BEbDVeP6yai';
 
 async function verifyStripeSignature(body: string, signature: string, secret: string): Promise<boolean> {
   try {
@@ -37,18 +36,11 @@ Deno.serve(async (req) => {
     const body = await req.text();
     const signature = req.headers.get('stripe-signature') || '';
 
-    // Only verify signature if webhook secret is properly configured (starts with whsec_)
-    if (WEBHOOK_SECRET && WEBHOOK_SECRET.startsWith('whsec_')) {
+    if (WEBHOOK_SECRET.startsWith('whsec_')) {
       const valid = await verifyStripeSignature(body, signature, WEBHOOK_SECRET);
       if (!valid) {
         console.error('❌ Webhook signature verification failed');
         return Response.json({ error: 'Invalid signature' }, { status: 400 });
-      }
-    } else {
-      // If secret not properly set, only allow requests with a valid Stripe signature header
-      // Log a warning but don't block — Stripe signature header being absent means direct call
-      if (signature && !WEBHOOK_SECRET.startsWith('whsec_')) {
-        console.warn('⚠️ STRIPE_WEBHOOK_SECRET not set correctly — skipping verification');
       }
     }
 
@@ -64,7 +56,7 @@ Deno.serve(async (req) => {
           subscription_status: 'active',
           trial_exhausted: false,
         });
-        console.log(`✅ User ${userId} upgraded to active subscription`);
+        console.log(`✅ User ${userId} upgraded to Pro`);
       }
     }
 
@@ -76,7 +68,7 @@ Deno.serve(async (req) => {
         await base44.asServiceRole.entities.User.update(userId, {
           subscription_status: 'expired',
         });
-        console.log(`⚠️ User ${userId} subscription expired/failed`);
+        console.log(`⚠️ User ${userId} subscription expired`);
       }
     }
 
