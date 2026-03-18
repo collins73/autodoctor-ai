@@ -1,3 +1,26 @@
-.agents/.env
-.agents/
+# ─── Environment & Secrets ───────────────────────────────────────
+.env
+.env.*
 *.env
+.agents/.env
+
+# ─── Node ────────────────────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ─── OS ──────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ─── Editor ──────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ─── Build ───────────────────────────────────────────────────────
+dist/
+build/
+.cache/
