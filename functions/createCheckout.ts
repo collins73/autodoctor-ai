@@ -1,6 +1,6 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.20';
 
-const STRIPE_SECRET_KEY = Deno.env.get('STRIPE_SECRET_KEY') || '';
+const STRIPE_SECRET_KEY = Deno.env.get('SECRET_KEY') || '';
 const APP_URL = 'https://rebelauto-diagnostics-ai.base44.app';
 
 Deno.serve(async (req) => {
