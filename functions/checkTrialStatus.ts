@@ -5,9 +5,27 @@ const TRIAL_LIMIT = 5;
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
-    const user = await base44.auth.me();
+
+    // Gracefully try to get user — don't hard fail if app is private/unauthenticated
+    let user: any = null;
+    try {
+      user = await base44.auth.me();
+    } catch (_) {
+      // unauthenticated — treat as fresh trial user
+    }
+
+    // No user at all — return default fresh trial state
     if (!user) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+      return Response.json({
+        success: true,
+        diagnosis_count: 0,
+        trial_limit: TRIAL_LIMIT,
+        remaining: TRIAL_LIMIT,
+        trial_exhausted: false,
+        subscription_status: 'trial',
+        feedback_submitted: false,
+        can_diagnose: true,
+      });
     }
 
     // Admin users are always Pro
@@ -33,7 +51,6 @@ Deno.serve(async (req) => {
       userRecord = null;
     }
 
-    // If no record, treat as fresh trial
     const diagnosisCount = userRecord?.diagnosis_count || 0;
     const subscriptionStatus = userRecord?.subscription_status || 'trial';
     const trialExhausted = subscriptionStatus !== 'active' && diagnosisCount >= TRIAL_LIMIT;
