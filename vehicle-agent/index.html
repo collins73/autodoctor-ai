@@ -1090,8 +1090,9 @@ function updateTrialBanner(used, limit, remaining) {
   const banner = document.getElementById('trial-banner');
   const text = document.getElementById('trial-text');
   if (!banner) return;
+  const r = (remaining == null || isNaN(remaining)) ? 5 : remaining;
   banner.style.display = 'flex';
-  text.textContent = remaining === 0 ? 'Trial complete — upgrade to continue' : `${remaining} free ${remaining === 1 ? 'diagnosis' : 'diagnoses'} remaining`;
+  text.textContent = r === 0 ? 'Trial complete — upgrade to continue' : `${r} free ${r === 1 ? 'diagnosis' : 'diagnoses'} remaining`;
   text.style.color = remaining <= 1 ? '#ef4444' : 'var(--orange)';
   for (let i = 0; i < limit; i++) {
     const pip = document.getElementById('tp'+i);
