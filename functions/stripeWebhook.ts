@@ -1,6 +1,6 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.20';
 
-const WEBHOOK_SECRET = 'whsec_1a2rZBOwVu8tfotMKP4UAtV1CoTOLUDc';
+const WEBHOOK_SECRET = Deno.env.get('STRIPE_WEBHOOK_SECRET') || '';
 
 async function verifyStripeSignature(body: string, signature: string, secret: string): Promise<boolean> {
   try {
