@@ -38,46 +38,57 @@ Deno.serve(async (req) => {
 
     const valid = await verifyStripeSignature(body, signature, WEBHOOK_SECRET);
     if (!valid) {
-      console.error('❌ Webhook signature verification failed');
+      console.error('Webhook signature verification failed');
       return Response.json({ error: 'Invalid signature' }, { status: 400 });
     }
 
     const event = JSON.parse(body);
     const base44 = createClientFromRequest(req);
 
-    console.log(`📩 Received event: ${event.type}`);
+    console.log('Received Stripe event:', event.type);
 
+    // Payment succeeded — activate Pro
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object;
       const userId = session.metadata?.user_id || session.client_reference_id;
-
-      console.log(`💳 Checkout completed — userId: ${userId}`);
-
       if (userId) {
         await base44.asServiceRole.entities.User.update(userId, {
           subscription_status: 'active',
           trial_exhausted: false,
         });
-        console.log(`✅ User ${userId} upgraded to Pro`);
+        console.log('User upgraded to Pro:', userId);
       }
     }
 
+    // Subscription renewed — keep active
+    if (event.type === 'invoice.payment_succeeded') {
+      const invoice = event.data.object;
+      const userId = invoice.subscription_details?.metadata?.user_id || invoice.metadata?.user_id;
+      if (userId) {
+        await base44.asServiceRole.entities.User.update(userId, {
+          subscription_status: 'active',
+          trial_exhausted: false,
+        });
+        console.log('Subscription renewed for user:', userId);
+      }
+    }
+
+    // Subscription cancelled or payment failed — expire Pro
     if (event.type === 'customer.subscription.deleted' || event.type === 'invoice.payment_failed') {
       const obj = event.data.object;
-      const userId = obj.metadata?.user_id;
-
+      const userId = obj.metadata?.user_id || obj.subscription_details?.metadata?.user_id;
       if (userId) {
         await base44.asServiceRole.entities.User.update(userId, {
           subscription_status: 'expired',
         });
-        console.log(`⚠️ User ${userId} subscription expired`);
+        console.log('Subscription expired for user:', userId);
       }
     }
 
     return Response.json({ received: true });
 
   } catch (error: any) {
-    console.error('❌ Error:', error.message);
+    console.error('Webhook error:', error.message);
     return Response.json({ error: error.message }, { status: 500 });
   }
 });
