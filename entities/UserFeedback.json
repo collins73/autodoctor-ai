@@ -1,0 +1,54 @@
+{
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "contact": {
+      "type": "string"
+    },
+    "navigation_rating": {
+      "type": "number"
+    },
+    "diagnosis_rating": {
+      "type": "number"
+    },
+    "would_use": {
+      "type": "string",
+      "enum": [
+        "Yes",
+        "No",
+        "Maybe"
+      ]
+    },
+    "would_pay": {
+      "type": "string",
+      "enum": [
+        "Yes",
+        "No",
+        "Maybe"
+      ]
+    },
+    "feedback": {
+      "type": "string"
+    },
+    "source": {
+      "type": "string",
+      "enum": [
+        "Text",
+        "Email",
+        "In-App"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "New",
+        "Reviewed",
+        "Actioned"
+      ]
+    }
+  },
+  "required": [],
+  "name": "UserFeedback"
+}

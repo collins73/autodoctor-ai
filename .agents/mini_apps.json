@@ -2,11 +2,17 @@
   "app_id": "69bb46cd789c087406dd2460",
   "slug": "rebel-ai-app-06dd2460",
   "pages": {
+    "Landing": {
+      "title": "Landing"
+    },
     "Dashboard": {
       "title": "Dashboard"
     },
-    "Landing": {
-      "title": "Landing"
+    "Feedback": {
+      "title": "Feedback"
+    },
+    "FeedbackTracker": {
+      "title": "FeedbackTracker"
     }
   }
 }
