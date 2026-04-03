@@ -349,6 +349,7 @@ function WiFiOBDMode({ vehicle, onCodesFound }) {
   const [port, setPort] = useState('35000');
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState(null);
+  const [showGuide, setShowGuide] = useState(false);
 
   async function connectWifi() {
     setLoading(true); setStatus(null);
@@ -371,11 +372,43 @@ function WiFiOBDMode({ vehicle, onCodesFound }) {
       <div style={S.cardPad}>
         <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 16 }}>
           <span style={{ fontSize: 30 }}>📶</span>
-          <div>
+          <div style={{ flex: 1 }}>
             <div style={{ fontSize: 16, fontWeight: 700 }}>WiFi OBD Scan</div>
             <div style={{ fontSize: 12, color: '#7c6a9e' }}>ELM327 WiFi adapter · Works on iPhone & Android</div>
           </div>
+          <button onClick={() => setShowGuide(g => !g)} style={{ background: showGuide ? 'rgba(168,85,247,0.2)' : 'rgba(255,255,255,0.05)', border: '1px solid rgba(168,85,247,0.3)', borderRadius: 20, width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: 15, color: '#c4b5fd', flexShrink: 0 }}>?</button>
         </div>
+
+        {/* ── Setup Guide (expandable) ── */}
+        {showGuide && (
+          <div style={{ background: 'rgba(124,58,237,0.07)', border: '1px solid rgba(124,58,237,0.25)', borderRadius: 14, padding: '14px 16px', marginBottom: 16 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: '#c4b5fd', marginBottom: 12 }}>📖 WiFi OBD2 Setup Guide</div>
+            {[
+              { icon: '🔌', title: 'Plug in the adapter', desc: 'Insert your WiFi ELM327 adapter into the OBD-II port. It's located under the dashboard on the driver's side. The adapter LED should light up.' },
+              { icon: '🔑', title: 'Turn the car on', desc: 'Turn your ignition to the ON position or start the engine. The adapter needs power from the car to broadcast its WiFi signal.' },
+              { icon: '📶', title: 'Connect to adapter WiFi', desc: 'Go to your phone's Settings → WiFi. Look for a network named "WiFi_OBDII", "ELM327", or similar. Default password is usually 12345678.' },
+              { icon: '📱', title: 'Come back to this page', desc: 'After connecting to the adapter's WiFi, return to the app. You won't have regular internet while connected — that's normal.' },
+              { icon: '⚡', title: 'Tap Connect & Read Codes', desc: 'The app connects to the adapter at 192.168.0.10:35000, reads your fault codes, and sends them to the AI for diagnosis automatically.' },
+            ].map((step, i) => (
+              <div key={i} style={{ display: 'flex', gap: 12, marginBottom: i < 4 ? 12 : 0, paddingBottom: i < 4 ? 12 : 0, borderBottom: i < 4 ? '1px solid rgba(124,58,237,0.15)' : 'none' }}>
+                <div style={{ fontSize: 20, flexShrink: 0, marginTop: 1 }}>{step.icon}</div>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: '#e2d9f3', marginBottom: 3 }}>{step.title}</div>
+                  <div style={{ fontSize: 12, color: '#8b6eae', lineHeight: 1.6 }}>{step.desc}</div>
+                </div>
+              </div>
+            ))}
+            <div style={{ marginTop: 12, background: 'rgba(251,146,60,0.08)', border: '1px solid rgba(251,146,60,0.2)', borderRadius: 10, padding: '8px 12px' }}>
+              <div style={{ fontSize: 12, color: '#fb923c', fontWeight: 700, marginBottom: 2 }}>⚠️ Troubleshooting</div>
+              <div style={{ fontSize: 12, color: '#9b7fd4', lineHeight: 1.6 }}>
+                • <b>No network found?</b> Make sure ignition is ON<br/>
+                • <b>Wrong IP?</b> Some adapters use 192.168.1.10 — try changing the IP field below<br/>
+                • <b>Won't connect?</b> Disconnect and reconnect to the adapter's WiFi, then retry
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* iOS info banner */}
         <div style={{ background: 'rgba(251,146,60,0.08)', border: '1px solid rgba(251,146,60,0.25)', borderRadius: 12, padding: '10px 14px', marginBottom: 16 }}>
           <div style={{ fontSize: 12, fontWeight: 700, color: '#fb923c', marginBottom: 4 }}>iPhone users — use this method</div>
@@ -385,7 +418,7 @@ function WiFiOBDMode({ vehicle, onCodesFound }) {
         <div style={{ marginBottom: 14 }}>
           {[
             ['1', 'Plug WiFi ELM327 adapter into OBD-II port'],
-            ['2', 'On your phone: Settings → WiFi → connect to adapter\'s network (e.g. "WiFi_OBDII")'],
+            ['2', 'On your phone: Settings → WiFi → connect to adapter's network (e.g. "WiFi_OBDII")'],
             ['3', 'Come back here and tap Connect'],
           ].map(([n, t]) => (
             <div key={n} style={{ display: 'flex', gap: 10, marginBottom: 8, alignItems: 'flex-start' }}>
