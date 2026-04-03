@@ -217,6 +217,56 @@ function share(diagnosis, vehicle) {
   else navigator.clipboard?.writeText(text).then(() => alert('Copied! ✅'));
 }
 
+// ─── QuickFeedback ───────────────────────────────────────────────────────────
+function QuickFeedback({ onDone, onDismiss }) {
+  const [rating, setRating] = useState(null);
+  const [comment, setComment] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  async function submit() {
+    if (!rating) return;
+    setLoading(true);
+    try {
+      await callFunction('submitFeedback', 'POST', {
+        name: 'Beta User',
+        contact: '',
+        diagnosis_rating: rating,
+        would_use: rating >= 4 ? 'Yes' : rating === 3 ? 'Maybe' : 'No',
+        feedback: comment || `Quick rating: ${rating}/5`,
+        source: 'post-diagnosis-nudge',
+      });
+    } catch (e) {}
+    setLoading(false);
+    onDone();
+  }
+
+  return (
+    <div>
+      <div style={{ fontSize: 14, fontWeight: 700, color: '#e2d9f3', marginBottom: 10 }}>How was your diagnosis?</div>
+      <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+        {[1,2,3,4,5].map(n => (
+          <button key={n} onClick={() => setRating(n)} style={{ flex: 1, height: 44, borderRadius: 10, border: rating === n ? '2px solid #a855f7' : '1px solid rgba(124,58,237,0.25)', background: rating === n ? 'rgba(168,85,247,0.2)' : 'rgba(255,255,255,0.03)', color: rating === n ? '#e9d5ff' : '#7c6a9e', fontWeight: 700, fontSize: 16, cursor: 'pointer', touchAction: 'manipulation' }}>
+            {['😞','😕','😐','🙂','😍'][n-1]}
+          </button>
+        ))}
+      </div>
+      <textarea
+        placeholder="Optional: anything you'd improve?"
+        value={comment}
+        onChange={e => setComment(e.target.value)}
+        rows={2}
+        style={{ width: '100%', background: '#18122b', border: '1px solid #2a1f4a', borderRadius: 10, padding: '10px 12px', color: '#c4b5fd', fontSize: 13, resize: 'none', boxSizing: 'border-box', marginBottom: 10 }}
+      />
+      <div style={{ display: 'flex', gap: 8 }}>
+        <button onClick={submit} disabled={!rating || loading} style={{ flex: 2, background: 'linear-gradient(135deg,#7c3aed,#a855f7)', border: 'none', borderRadius: 10, padding: '10px 0', color: '#fff', fontWeight: 700, fontSize: 13, cursor: 'pointer', opacity: (!rating || loading) ? 0.5 : 1, touchAction: 'manipulation' }}>
+          {loading ? '⏳ Sending...' : '✅ Submit'}
+        </button>
+        <button onClick={onDismiss} style={{ flex: 1, background: 'transparent', border: '1px solid rgba(124,58,237,0.2)', borderRadius: 10, padding: '10px 0', color: '#7c6a9e', fontSize: 13, cursor: 'pointer', touchAction: 'manipulation' }}>Skip</button>
+      </div>
+    </div>
+  );
+}
+
 // ─── DiagnosisCard ─────────────────────────────────────────────────────────
 function DiagnosisCard({ diagnosis, vehicle }) {
   if (!diagnosis) return null;
@@ -528,6 +578,7 @@ export default function Diagnose() {
   const [messages, setMessages] = useState([]);
   const [chatInput, setChatInput] = useState('');
   const [isChatting, setIsChatting] = useState(false);
+  const [feedbackNudge, setFeedbackNudge] = useState('idle'); // idle | shown | submitted | dismissed
   const [device] = useState(() => detectDevice());
 
   const STEPS = ['Vehicle', 'Method', 'Diagnose', 'Results'];
@@ -741,6 +792,35 @@ export default function Diagnose() {
         {step === 4 && !isSending && diagnosis && (
           <div>
             <DiagnosisCard diagnosis={diagnosis} vehicle={vehicle} />
+
+            {/* ── Feedback Nudge ── */}
+            {feedbackNudge !== 'dismissed' && feedbackNudge !== 'submitted' && (
+              <div style={{ background: 'linear-gradient(135deg, rgba(124,58,237,0.12), rgba(168,85,247,0.08))', border: '1px solid rgba(168,85,247,0.3)', borderRadius: 16, padding: '16px 18px', marginBottom: 14 }}>
+                {feedbackNudge === 'idle' && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: '#e2d9f3', marginBottom: 3 }}>⚡ Was this helpful?</div>
+                      <div style={{ fontSize: 12, color: '#7c6a9e' }}>Takes 30 seconds — helps us improve the app</div>
+                    </div>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <button onClick={() => setFeedbackNudge('shown')} style={{ background: 'linear-gradient(135deg,#7c3aed,#a855f7)', border: 'none', borderRadius: 10, padding: '9px 16px', color: '#fff', fontWeight: 700, fontSize: 13, cursor: 'pointer', touchAction: 'manipulation' }}>Give Feedback</button>
+                      <button onClick={() => setFeedbackNudge('dismissed')} style={{ background: 'transparent', border: '1px solid rgba(124,58,237,0.3)', borderRadius: 10, padding: '9px 12px', color: '#7c6a9e', fontSize: 13, cursor: 'pointer', touchAction: 'manipulation' }}>✕</button>
+                    </div>
+                  </div>
+                )}
+                {feedbackNudge === 'shown' && (
+                  <QuickFeedback onDone={() => setFeedbackNudge('submitted')} onDismiss={() => setFeedbackNudge('dismissed')} />
+                )}
+              </div>
+            )}
+            {feedbackNudge === 'submitted' && (
+              <div style={{ background: 'rgba(74,222,128,0.08)', border: '1px solid rgba(74,222,128,0.25)', borderRadius: 16, padding: '14px 18px', marginBottom: 14, textAlign: 'center' }}>
+                <div style={{ fontSize: 20, marginBottom: 6 }}>🙏</div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: '#4ade80', marginBottom: 4 }}>Thanks for the feedback!</div>
+                <div style={{ fontSize: 12, color: '#6b7280' }}>You're helping make this better for everyone.</div>
+              </div>
+            )}
+
             {/* Chat */}
             <div style={S.card}>
               <div style={{ padding: '14px 20px', borderBottom: '1px solid #2a1f4a', fontSize: 14, fontWeight: 700 }}>🤖 Ask a follow-up</div>
