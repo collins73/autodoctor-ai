@@ -201,7 +201,7 @@ function DashboardInner() {
             <div style={{ fontSize: 12, color: '#7c6a9e', marginTop: 2 }}>Scan a fault code</div>
           </div>
         </Link>
-        <Link to="/Vehicles" style={{ textDecoration: 'none' }}>
+        <Link to="/Diagnose" style={{ textDecoration: 'none' }}>
           <div style={{ background: 'linear-gradient(135deg,rgba(96,165,250,0.1),rgba(59,130,246,0.05))', border: '1px solid rgba(96,165,250,0.25)', borderRadius: 16, padding: 18, cursor: 'pointer' }}>
             <div style={{ fontSize: 24, marginBottom: 8 }}>🚗</div>
             <div style={{ fontSize: 14, fontWeight: 700, color: '#93c5fd' }}>My Vehicles</div>
