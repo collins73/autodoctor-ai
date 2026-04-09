@@ -62,7 +62,7 @@ export default function Landing() {
             style={{ background: 'linear-gradient(135deg,#fb923c,#f87171)', border: 'none', borderRadius: 14, padding: '16px 36px', color: '#fff', fontWeight: 800, fontSize: 16, cursor: 'pointer', boxShadow: '0 8px 32px rgba(251,146,60,0.35)', opacity: loading ? 0.7 : 1 }}>
             {loading ? 'Loading...' : 'Start Free — 5 Diagnoses Free'}
           </button>
-          <a href="https://rebelauto-diagnostics-ai.base44.app" target="_blank" rel="noreferrer"
+          <a href="https://rebelauto-diagnostics-ai.com" target="_blank" rel="noreferrer"
             style={{ background: 'transparent', border: '1.5px solid #2a1f4a', borderRadius: 14, padding: '16px 36px', color: '#c4b5fd', fontWeight: 700, fontSize: 16, cursor: 'pointer', textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}>
             Open App
           </a>
