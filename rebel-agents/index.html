@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rebel Agents — AI That Fights For You</title>
+  <meta name="description" content="One subscription. Six AI agents. Each one built to protect you from being overcharged, misled, or taken advantage of." />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --rebel-red: #e63946;
+      --rebel-dark: #0a0a0a;
+      --rebel-card: #111111;
+      --rebel-border: #222222;
+      --rebel-gray: #888888;
+      --rebel-white: #f5f5f5;
+    }
+
+    body {
+      background: var(--rebel-dark);
+      color: var(--rebel-white);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      line-height: 1.6;
+    }
+
+    /* NAV */
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 40px;
+      border-bottom: 1px solid var(--rebel-border);
+      position: sticky;
+      top: 0;
+      background: rgba(10,10,10,0.95);
+      backdrop-filter: blur(10px);
+      z-index: 100;
+    }
+
+    .nav-logo {
+      font-size: 1.4rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .nav-logo span { color: var(--rebel-red); }
+
+    .nav-cta {
+      background: var(--rebel-red);
+      color: white;
+      border: none;
+      padding: 10px 24px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+
+    .nav-cta:hover { opacity: 0.85; }
+
+    /* HERO */
+    .hero {
+      text-align: center;
+      padding: 100px 20px 80px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      background: rgba(230,57,70,0.15);
+      border: 1px solid rgba(230,57,70,0.4);
+      color: var(--rebel-red);
+      padding: 6px 16px;
+      border-radius: 100px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 900;
+      line-height: 1.1;
+      letter-spacing: -1px;
+      margin-bottom: 24px;
+    }
+
+    .hero h1 span { color: var(--rebel-red); }
+
+    .hero p {
+      font-size: 1.2rem;
+      color: var(--rebel-gray);
+      max-width: 600px;
+      margin: 0 auto 40px;
+      line-height: 1.7;
+    }
+
+    .hero-cta-group {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      background: var(--rebel-red);
+      color: white;
+      padding: 16px 36px;
+      border-radius: 8px;
+      font-weight: 800;
+      font-size: 1rem;
+      text-decoration: none;
+      transition: opacity 0.2s, transform 0.2s;
+      display: inline-block;
+    }
+
+    .btn-primary:hover { opacity: 0.9; transform: translateY(-2px); }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--rebel-white);
+      padding: 16px 36px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 1rem;
+      text-decoration: none;
+      border: 1px solid var(--rebel-border);
+      transition: border-color 0.2s;
+      display: inline-block;
+    }
+
+    .btn-secondary:hover { border-color: #555; }
+
+    /* STATS BAR */
+    .stats-bar {
+      display: flex;
+      justify-content: center;
+      gap: 60px;
+      padding: 40px 20px;
+      border-top: 1px solid var(--rebel-border);
+      border-bottom: 1px solid var(--rebel-border);
+      flex-wrap: wrap;
+    }
+
+    .stat { text-align: center; }
+    .stat-number {
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--rebel-red);
+    }
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--rebel-gray);
+      margin-top: 4px;
+    }
+
+    /* AGENTS GRID */
+    .agents-section {
+      max-width: 1100px;
+      margin: 80px auto;
+      padding: 0 20px;
+    }
+
+    .section-label {
+      text-align: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--rebel-red);
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 900;
+      margin-bottom: 12px;
+      letter-spacing: -0.5px;
+    }
+
+    .section-subtitle {
+      text-align: center;
+      color: var(--rebel-gray);
+      font-size: 1rem;
+      margin-bottom: 60px;
+    }
+
+    .agents-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 24px;
+    }
+
+    .agent-card {
+      background: var(--rebel-card);
+      border: 1px solid var(--rebel-border);
+      border-radius: 12px;
+      padding: 32px;
+      transition: border-color 0.2s, transform 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .agent-card:hover {
+      border-color: #333;
+      transform: translateY(-4px);
+    }
+
+    .agent-card.live {
+      border-color: rgba(230,57,70,0.4);
+    }
+
+    .agent-card.live::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--rebel-red);
+    }
+
+    .agent-icon {
+      font-size: 2.2rem;
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    .agent-badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 100px;
+      margin-bottom: 12px;
+    }
+
+    .badge-live {
+      background: rgba(230,57,70,0.15);
+      color: var(--rebel-red);
+      border: 1px solid rgba(230,57,70,0.3);
+    }
+
+    .badge-soon {
+      background: rgba(136,136,136,0.1);
+      color: var(--rebel-gray);
+      border: 1px solid rgba(136,136,136,0.2);
+    }
+
+    .agent-name {
+      font-size: 1.3rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .agent-desc {
+      color: var(--rebel-gray);
+      font-size: 0.9rem;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .agent-link {
+      display: inline-block;
+      color: var(--rebel-red);
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+
+    .agent-link:hover { opacity: 0.75; }
+
+    .agent-link-soon {
+      color: var(--rebel-gray);
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    /* PRICING */
+    .pricing-section {
+      max-width: 600px;
+      margin: 80px auto;
+      padding: 0 20px;
+      text-align: center;
+    }
+
+    .pricing-card {
+      background: var(--rebel-card);
+      border: 1px solid rgba(230,57,70,0.4);
+      border-radius: 16px;
+      padding: 48px 40px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .pricing-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--rebel-red);
+    }
+
+    .pricing-tag {
+      display: inline-block;
+      background: var(--rebel-red);
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 4px 14px;
+      border-radius: 100px;
+      margin-bottom: 20px;
+    }
+
+    .pricing-name {
+      font-size: 1.5rem;
+      font-weight: 900;
+      margin-bottom: 8px;
+    }
+
+    .pricing-price {
+      font-size: 3.5rem;
+      font-weight: 900;
+      color: var(--rebel-red);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .pricing-period {
+      color: var(--rebel-gray);
+      font-size: 0.9rem;
+      margin-bottom: 32px;
+    }
+
+    .pricing-features {
+      list-style: none;
+      text-align: left;
+      margin-bottom: 36px;
+    }
+
+    .pricing-features li {
+      padding: 10px 0;
+      border-bottom: 1px solid var(--rebel-border);
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .pricing-features li:last-child { border-bottom: none; }
+
+    .check { color: var(--rebel-red); font-weight: 900; font-size: 1rem; }
+
+    .pricing-cta {
+      display: block;
+      background: var(--rebel-red);
+      color: white;
+      padding: 16px;
+      border-radius: 8px;
+      font-weight: 800;
+      font-size: 1rem;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+
+    .pricing-cta:hover { opacity: 0.85; }
+
+    .pricing-note {
+      color: var(--rebel-gray);
+      font-size: 0.8rem;
+      margin-top: 16px;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--rebel-border);
+      padding: 40px 20px;
+      text-align: center;
+      color: var(--rebel-gray);
+      font-size: 0.85rem;
+    }
+
+    footer .footer-logo {
+      font-size: 1.2rem;
+      font-weight: 900;
+      color: var(--rebel-white);
+      margin-bottom: 12px;
+    }
+
+    footer .footer-logo span { color: var(--rebel-red); }
+
+    @media (max-width: 600px) {
+      nav { padding: 16px 20px; }
+      .hero { padding: 60px 20px 60px; }
+      .stats-bar { gap: 30px; }
+      .pricing-card { padding: 36px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-logo">Rebel<span>Agents</span>.ai</div>
+    <a href="#pricing" class="nav-cta">Get Access</a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-badge">⚡ AI That Fights For You</div>
+    <h1>Stop Getting <span>Taken Advantage Of.</span></h1>
+    <p>One subscription. Six AI agents. Each one built to protect you from being overcharged, misled, or left in the dark.</p>
+    <div class="hero-cta-group">
+      <a href="#pricing" class="btn-primary">Get Full Access — $19.99/mo</a>
+      <a href="https://rebelauto-diagnostics-ai.com" target="_blank" class="btn-secondary">Try Auto Agent Free</a>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <div class="stats-bar">
+    <div class="stat">
+      <div class="stat-number">6</div>
+      <div class="stat-label">AI Agents</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number">$400+</div>
+      <div class="stat-label">Avg. Annual Savings</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number">30s</div>
+      <div class="stat-label">To Get a Diagnosis</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number">24/7</div>
+      <div class="stat-label">Always On</div>
+    </div>
+  </div>
+
+  <!-- AGENTS GRID -->
+  <section class="agents-section">
+    <div class="section-label">The Suite</div>
+    <h2 class="section-title">Every Agent. One Subscription.</h2>
+    <p class="section-subtitle">Each agent tackles a different area where people get overcharged or misled.</p>
+
+    <div class="agents-grid">
+
+      <!-- AUTO — LIVE -->
+      <div class="agent-card live">
+        <span class="agent-icon">🚗</span>
+        <span class="agent-badge badge-live">Live Now</span>
+        <div class="agent-name">Rebel Auto Agent</div>
+        <div class="agent-desc">Check engine light on? Get an instant AI diagnosis, real cost estimates, and nearby shops — before you hand over a dime to a mechanic.</div>
+        <a href="https://rebelauto-diagnostics-ai.com" target="_blank" class="agent-link">Launch Auto Agent →</a>
+      </div>
+
+      <!-- HOME -->
+      <div class="agent-card">
+        <span class="agent-icon">🏠</span>
+        <span class="agent-badge badge-soon">Coming Soon</span>
+        <div class="agent-name">Rebel Home Agent</div>
+        <div class="agent-desc">HVAC not cooling? Leak under the sink? Describe the issue and get an AI breakdown of what's wrong, what it costs, and which contractors to call.</div>
+        <span class="agent-link-soon">Notify me when live</span>
+      </div>
+
+      <!-- HEALTH -->
+      <div class="agent-card">
+        <span class="agent-icon">🏥</span>
+        <span class="agent-badge badge-soon">Coming Soon</span>
+        <div class="agent-name">Rebel Health Agent</div>
+        <div class="agent-desc">Upload your medical bill and let AI scan it for overcharges, billing errors, and negotiation opportunities. Americans overpay billions every year.</div>
+        <span class="agent-link-soon">Notify me when live</span>
+      </div>
+
+      <!-- RIGHTS -->
+      <div class="agent-card">
+        <span class="agent-icon">⚖️</span>
+        <span class="agent-badge badge-soon">Coming Soon</span>
+        <div class="agent-name">Rebel Rights Agent</div>
+        <div class="agent-desc">Landlord issues? Workplace dispute? Know your rights instantly. Get plain English explanations and ready-to-send letters — no lawyer required.</div>
+        <span class="agent-link-soon">Notify me when live</span>
+      </div>
+
+      <!-- CONTRACT -->
+      <div class="agent-card">
+        <span class="agent-icon">📋</span>
+        <span class="agent-badge badge-soon">Coming Soon</span>
+        <div class="agent-name">Rebel Contract Agent</div>
+        <div class="agent-desc">Upload any contract and get an instant AI review. Flags risky clauses, explains confusing language, and tells you what to watch out for before you sign.</div>
+        <span class="agent-link-soon">Notify me when live</span>
+      </div>
+
+      <!-- CREDIT -->
+      <div class="agent-card">
+        <span class="agent-icon">💳</span>
+        <span class="agent-badge badge-soon">Coming Soon</span>
+        <div class="agent-name">Rebel Credit Agent</div>
+        <div class="agent-desc">Upload your credit report and get a personalized AI action plan. Identifies exactly what's hurting your score and gives you a step-by-step fix.</div>
+        <span class="agent-link-soon">Notify me when live</span>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section class="pricing-section" id="pricing">
+    <div class="section-label">Pricing</div>
+    <h2 class="section-title">One Price. All Agents.</h2>
+    <p class="section-subtitle" style="margin-bottom: 40px;">Cancel anytime. No hidden fees.</p>
+
+    <div class="pricing-card">
+      <span class="pricing-tag">Most Popular</span>
+      <div class="pricing-name">Rebel Full Access</div>
+      <div class="pricing-price">$19.99</div>
+      <div class="pricing-period">per month — all agents included</div>
+
+      <ul class="pricing-features">
+        <li><span class="check">✓</span> Unlimited diagnostics across all agents</li>
+        <li><span class="check">✓</span> Rebel Auto Agent — live now</li>
+        <li><span class="check">✓</span> Rebel Home Agent — coming soon</li>
+        <li><span class="check">✓</span> Rebel Health Agent — coming soon</li>
+        <li><span class="check">✓</span> Rebel Rights Agent — coming soon</li>
+        <li><span class="check">✓</span> Rebel Contract Agent — coming soon</li>
+        <li><span class="check">✓</span> Rebel Credit Agent — coming soon</li>
+        <li><span class="check">✓</span> Early access to new agents as they launch</li>
+        <li><span class="check">✓</span> Priority support</li>
+      </ul>
+
+      <a href="https://rebelauto-diagnostics-ai.com" class="pricing-cta">Get Full Access Now</a>
+      <p class="pricing-note">Start with Auto Agent free. Upgrade anytime to unlock the full suite.</p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">Rebel<span>Agents</span>.ai</div>
+    <p>AI that fights for you. Built for real people facing real problems.</p>
+    <p style="margin-top: 12px;">© 2026 Rebel Agents. All rights reserved.</p>
+  </footer>
+
+</body>
+</html>
