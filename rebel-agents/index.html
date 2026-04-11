@@ -9,172 +9,408 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
-      --rebel-red: #e63946;
-      --rebel-dark: #0a0a0a;
-      --rebel-card: #111111;
-      --rebel-border: #222222;
-      --rebel-gray: #888888;
-      --rebel-white: #f5f5f5;
+      --red: #e63946;
+      --dark: #0a0a0a;
+      --card: #111111;
+      --border: #222222;
+      --gray: #888888;
+      --light-gray: #cccccc;
+      --white: #f5f5f5;
     }
+
+    html { scroll-behavior: smooth; }
 
     body {
-      background: var(--rebel-dark);
-      color: var(--rebel-white);
+      background: var(--dark);
+      color: var(--white);
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
       line-height: 1.6;
+      overflow-x: hidden;
     }
 
-    /* NAV */
+    /* ── NAV ── */
     nav {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 20px 40px;
-      border-bottom: 1px solid var(--rebel-border);
+      padding: 18px 48px;
+      border-bottom: 1px solid var(--border);
       position: sticky;
       top: 0;
-      background: rgba(10,10,10,0.95);
-      backdrop-filter: blur(10px);
-      z-index: 100;
+      background: rgba(10,10,10,0.96);
+      backdrop-filter: blur(12px);
+      z-index: 200;
     }
 
-    .nav-logo {
-      font-size: 1.4rem;
-      font-weight: 800;
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+
+    .nav-logo-img {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+
+    .nav-name {
+      font-size: 1.3rem;
+      font-weight: 900;
+      color: var(--white);
       letter-spacing: -0.5px;
     }
 
-    .nav-logo span { color: var(--rebel-red); }
+    .nav-name span { color: var(--red); }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+
+    .nav-links a {
+      color: var(--gray);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--white); }
 
     .nav-cta {
-      background: var(--rebel-red);
-      color: white;
-      border: none;
-      padding: 10px 24px;
+      background: var(--red);
+      color: white !important;
+      padding: 10px 22px;
       border-radius: 6px;
       font-weight: 700;
       font-size: 0.9rem;
-      cursor: pointer;
-      text-decoration: none;
-      transition: opacity 0.2s;
+      transition: opacity 0.2s !important;
     }
 
-    .nav-cta:hover { opacity: 0.85; }
+    .nav-cta:hover { opacity: 0.85; color: white; }
 
-    /* HERO */
+    /* ── HERO ── */
     .hero {
+      min-height: 92vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
       text-align: center;
-      padding: 100px 20px 80px;
-      max-width: 800px;
-      margin: 0 auto;
+      padding: 80px 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(230,57,70,0.12) 0%, transparent 70%);
+      pointer-events: none;
     }
 
     .hero-badge {
-      display: inline-block;
-      background: rgba(230,57,70,0.15);
-      border: 1px solid rgba(230,57,70,0.4);
-      color: var(--rebel-red);
-      padding: 6px 16px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(230,57,70,0.12);
+      border: 1px solid rgba(230,57,70,0.35);
+      color: var(--red);
+      padding: 8px 18px;
       border-radius: 100px;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       font-weight: 700;
-      letter-spacing: 1px;
+      letter-spacing: 1.5px;
       text-transform: uppercase;
-      margin-bottom: 24px;
+      margin-bottom: 28px;
     }
 
     .hero h1 {
-      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-size: clamp(2.8rem, 7vw, 5.5rem);
       font-weight: 900;
-      line-height: 1.1;
-      letter-spacing: -1px;
-      margin-bottom: 24px;
+      line-height: 1.05;
+      letter-spacing: -2px;
+      margin-bottom: 28px;
+      max-width: 900px;
     }
 
-    .hero h1 span { color: var(--rebel-red); }
+    .hero h1 span { color: var(--red); }
 
-    .hero p {
-      font-size: 1.2rem;
-      color: var(--rebel-gray);
-      max-width: 600px;
-      margin: 0 auto 40px;
-      line-height: 1.7;
+    .hero-sub {
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      color: var(--light-gray);
+      max-width: 640px;
+      margin: 0 auto 48px;
+      line-height: 1.8;
     }
 
-    .hero-cta-group {
+    .hero-ctas {
       display: flex;
       gap: 16px;
       justify-content: center;
       flex-wrap: wrap;
+      margin-bottom: 64px;
     }
 
-    .btn-primary {
-      background: var(--rebel-red);
+    .btn-red {
+      background: var(--red);
       color: white;
       padding: 16px 36px;
       border-radius: 8px;
       font-weight: 800;
       font-size: 1rem;
       text-decoration: none;
-      transition: opacity 0.2s, transform 0.2s;
       display: inline-block;
+      transition: opacity 0.2s, transform 0.2s;
     }
 
-    .btn-primary:hover { opacity: 0.9; transform: translateY(-2px); }
+    .btn-red:hover { opacity: 0.88; transform: translateY(-2px); }
 
-    .btn-secondary {
+    .btn-outline {
       background: transparent;
-      color: var(--rebel-white);
+      color: var(--white);
       padding: 16px 36px;
       border-radius: 8px;
       font-weight: 700;
       font-size: 1rem;
       text-decoration: none;
-      border: 1px solid var(--rebel-border);
-      transition: border-color 0.2s;
+      border: 1px solid var(--border);
       display: inline-block;
+      transition: border-color 0.2s, transform 0.2s;
     }
 
-    .btn-secondary:hover { border-color: #555; }
+    .btn-outline:hover { border-color: #555; transform: translateY(-2px); }
 
-    /* STATS BAR */
-    .stats-bar {
+    .hero-trust {
       display: flex;
+      gap: 32px;
       justify-content: center;
-      gap: 60px;
-      padding: 40px 20px;
-      border-top: 1px solid var(--rebel-border);
-      border-bottom: 1px solid var(--rebel-border);
       flex-wrap: wrap;
     }
 
-    .stat { text-align: center; }
-    .stat-number {
-      font-size: 2rem;
-      font-weight: 900;
-      color: var(--rebel-red);
-    }
-    .stat-label {
+    .trust-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--gray);
       font-size: 0.85rem;
-      color: var(--rebel-gray);
-      margin-top: 4px;
     }
 
-    /* AGENTS GRID */
+    .trust-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--red);
+    }
+
+    /* ── VIDEO SECTION ── */
+    .video-section {
+      max-width: 900px;
+      margin: 0 auto 80px;
+      padding: 0 24px;
+    }
+
+    .video-wrapper {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: 0 40px 80px rgba(0,0,0,0.6);
+      background: #0d0d0d;
+      aspect-ratio: 16/9;
+      cursor: pointer;
+    }
+
+    .video-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #0d0d0d 0%, #1a0505 50%, #0d0d0d 100%);
+      position: relative;
+    }
+
+    .video-placeholder::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 60% 60% at 50% 50%, rgba(230,57,70,0.08) 0%, transparent 70%);
+    }
+
+    .play-btn {
+      width: 80px;
+      height: 80px;
+      background: var(--red);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 1;
+      box-shadow: 0 0 40px rgba(230,57,70,0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+      text-decoration: none;
+    }
+
+    .play-btn:hover {
+      transform: scale(1.08);
+      box-shadow: 0 0 60px rgba(230,57,70,0.6);
+    }
+
+    .video-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--white);
+      position: relative;
+      z-index: 1;
+      margin-bottom: 8px;
+    }
+
+    .video-sub {
+      font-size: 0.85rem;
+      color: var(--gray);
+      position: relative;
+      z-index: 1;
+    }
+
+    /* animated lines behind video */
+    .video-lines {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      opacity: 0.15;
+    }
+
+    .video-lines::before,
+    .video-lines::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      border-radius: 50%;
+      border: 1px solid var(--red);
+      animation: pulse-ring 3s ease-out infinite;
+    }
+
+    .video-lines::after { animation-delay: 1.5s; }
+
+    @keyframes pulse-ring {
+      0% { width: 80px; height: 80px; transform: translate(-50%,-50%); opacity: 1; }
+      100% { width: 600px; height: 600px; transform: translate(-50%,-50%); opacity: 0; }
+    }
+
+    /* ── STATS ── */
+    .stats-bar {
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+
+    .stat {
+      text-align: center;
+      padding: 36px 48px;
+      border-right: 1px solid var(--border);
+      flex: 1;
+      min-width: 150px;
+    }
+
+    .stat:last-child { border-right: none; }
+
+    .stat-number {
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: var(--red);
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--gray);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* ── MISSION / VISION ── */
+    .mv-section {
+      max-width: 1100px;
+      margin: 100px auto;
+      padding: 0 24px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+    }
+
+    .mv-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 48px 40px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .mv-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--red);
+    }
+
+    .mv-icon {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      display: block;
+    }
+
+    .mv-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 12px;
+    }
+
+    .mv-title {
+      font-size: 1.8rem;
+      font-weight: 900;
+      margin-bottom: 16px;
+      letter-spacing: -0.5px;
+    }
+
+    .mv-text {
+      color: var(--light-gray);
+      font-size: 1rem;
+      line-height: 1.8;
+    }
+
+    /* ── AGENTS GRID ── */
     .agents-section {
       max-width: 1100px;
       margin: 80px auto;
-      padding: 0 20px;
+      padding: 0 24px;
     }
 
     .section-label {
       text-align: center;
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       font-weight: 700;
       letter-spacing: 2px;
       text-transform: uppercase;
-      color: var(--rebel-red);
-      margin-bottom: 16px;
+      color: var(--red);
+      margin-bottom: 14px;
     }
 
     .section-title {
@@ -185,22 +421,22 @@
       letter-spacing: -0.5px;
     }
 
-    .section-subtitle {
+    .section-sub {
       text-align: center;
-      color: var(--rebel-gray);
+      color: var(--gray);
       font-size: 1rem;
-      margin-bottom: 60px;
+      margin-bottom: 56px;
     }
 
     .agents-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 24px;
+      gap: 20px;
     }
 
     .agent-card {
-      background: var(--rebel-card);
-      border: 1px solid var(--rebel-border);
+      background: var(--card);
+      border: 1px solid var(--border);
       border-radius: 12px;
       padding: 32px;
       transition: border-color 0.2s, transform 0.2s;
@@ -208,32 +444,23 @@
       overflow: hidden;
     }
 
-    .agent-card:hover {
-      border-color: #333;
-      transform: translateY(-4px);
-    }
+    .agent-card:hover { border-color: #333; transform: translateY(-4px); }
 
-    .agent-card.live {
-      border-color: rgba(230,57,70,0.4);
-    }
+    .agent-card.live { border-color: rgba(230,57,70,0.35); }
 
     .agent-card.live::before {
       content: '';
       position: absolute;
       top: 0; left: 0; right: 0;
       height: 2px;
-      background: var(--rebel-red);
+      background: var(--red);
     }
 
-    .agent-icon {
-      font-size: 2.2rem;
-      margin-bottom: 16px;
-      display: block;
-    }
+    .agent-icon { font-size: 2.2rem; margin-bottom: 14px; display: block; }
 
     .agent-badge {
       display: inline-block;
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       font-weight: 700;
       letter-spacing: 1px;
       text-transform: uppercase;
@@ -242,61 +469,30 @@
       margin-bottom: 12px;
     }
 
-    .badge-live {
-      background: rgba(230,57,70,0.15);
-      color: var(--rebel-red);
-      border: 1px solid rgba(230,57,70,0.3);
-    }
+    .badge-live { background: rgba(230,57,70,0.12); color: var(--red); border: 1px solid rgba(230,57,70,0.3); }
+    .badge-soon { background: rgba(136,136,136,0.08); color: var(--gray); border: 1px solid rgba(136,136,136,0.2); }
 
-    .badge-soon {
-      background: rgba(136,136,136,0.1);
-      color: var(--rebel-gray);
-      border: 1px solid rgba(136,136,136,0.2);
-    }
+    .agent-name { font-size: 1.25rem; font-weight: 800; margin-bottom: 8px; }
 
-    .agent-name {
-      font-size: 1.3rem;
-      font-weight: 800;
-      margin-bottom: 8px;
-    }
+    .agent-desc { color: var(--gray); font-size: 0.9rem; line-height: 1.65; margin-bottom: 20px; }
 
-    .agent-desc {
-      color: var(--rebel-gray);
-      font-size: 0.9rem;
-      line-height: 1.6;
-      margin-bottom: 20px;
-    }
-
-    .agent-link {
-      display: inline-block;
-      color: var(--rebel-red);
-      font-weight: 700;
-      font-size: 0.9rem;
-      text-decoration: none;
-      transition: opacity 0.2s;
-    }
-
+    .agent-link { display: inline-block; color: var(--red); font-weight: 700; font-size: 0.9rem; text-decoration: none; transition: opacity 0.2s; }
     .agent-link:hover { opacity: 0.75; }
+    .agent-link-soon { color: var(--gray); font-size: 0.85rem; font-weight: 600; }
 
-    .agent-link-soon {
-      color: var(--rebel-gray);
-      font-size: 0.85rem;
-      font-weight: 600;
-    }
-
-    /* PRICING */
+    /* ── PRICING ── */
     .pricing-section {
-      max-width: 600px;
-      margin: 80px auto;
-      padding: 0 20px;
+      max-width: 620px;
+      margin: 100px auto;
+      padding: 0 24px;
       text-align: center;
     }
 
     .pricing-card {
-      background: var(--rebel-card);
-      border: 1px solid rgba(230,57,70,0.4);
-      border-radius: 16px;
-      padding: 48px 40px;
+      background: var(--card);
+      border: 1px solid rgba(230,57,70,0.35);
+      border-radius: 20px;
+      padding: 56px 48px;
       position: relative;
       overflow: hidden;
     }
@@ -306,103 +502,106 @@
       position: absolute;
       top: 0; left: 0; right: 0;
       height: 3px;
-      background: var(--rebel-red);
+      background: var(--red);
     }
 
     .pricing-tag {
       display: inline-block;
-      background: var(--rebel-red);
+      background: var(--red);
       color: white;
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       font-weight: 700;
       letter-spacing: 1px;
       text-transform: uppercase;
-      padding: 4px 14px;
+      padding: 5px 16px;
       border-radius: 100px;
-      margin-bottom: 20px;
+      margin-bottom: 24px;
     }
 
-    .pricing-name {
-      font-size: 1.5rem;
-      font-weight: 900;
-      margin-bottom: 8px;
-    }
+    .pricing-name { font-size: 1.4rem; font-weight: 900; margin-bottom: 10px; }
 
     .pricing-price {
-      font-size: 3.5rem;
+      font-size: 4rem;
       font-weight: 900;
-      color: var(--rebel-red);
+      color: var(--red);
       line-height: 1;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
     }
 
-    .pricing-period {
-      color: var(--rebel-gray);
-      font-size: 0.9rem;
-      margin-bottom: 32px;
-    }
+    .pricing-period { color: var(--gray); font-size: 0.9rem; margin-bottom: 36px; }
 
-    .pricing-features {
-      list-style: none;
-      text-align: left;
-      margin-bottom: 36px;
-    }
+    .pricing-features { list-style: none; text-align: left; margin-bottom: 40px; }
 
     .pricing-features li {
-      padding: 10px 0;
-      border-bottom: 1px solid var(--rebel-border);
+      padding: 11px 0;
+      border-bottom: 1px solid var(--border);
       font-size: 0.95rem;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
+      color: var(--light-gray);
     }
 
     .pricing-features li:last-child { border-bottom: none; }
 
-    .check { color: var(--rebel-red); font-weight: 900; font-size: 1rem; }
+    .check { color: var(--red); font-weight: 900; }
 
     .pricing-cta {
       display: block;
-      background: var(--rebel-red);
+      background: var(--red);
       color: white;
-      padding: 16px;
-      border-radius: 8px;
+      padding: 18px;
+      border-radius: 10px;
       font-weight: 800;
-      font-size: 1rem;
+      font-size: 1.05rem;
       text-decoration: none;
       transition: opacity 0.2s;
     }
 
-    .pricing-cta:hover { opacity: 0.85; }
+    .pricing-cta:hover { opacity: 0.87; }
 
-    .pricing-note {
-      color: var(--rebel-gray);
-      font-size: 0.8rem;
-      margin-top: 16px;
-    }
+    .pricing-note { color: var(--gray); font-size: 0.8rem; margin-top: 16px; }
 
-    /* FOOTER */
+    /* ── FOOTER ── */
     footer {
-      border-top: 1px solid var(--rebel-border);
-      padding: 40px 20px;
+      border-top: 1px solid var(--border);
+      padding: 48px 24px;
       text-align: center;
-      color: var(--rebel-gray);
+      color: var(--gray);
       font-size: 0.85rem;
     }
 
-    footer .footer-logo {
-      font-size: 1.2rem;
-      font-weight: 900;
-      color: var(--rebel-white);
-      margin-bottom: 12px;
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 16px;
     }
 
-    footer .footer-logo span { color: var(--rebel-red); }
+    .footer-logo-img {
+      width: 30px;
+      height: 30px;
+      border-radius: 6px;
+      object-fit: cover;
+    }
 
-    @media (max-width: 600px) {
+    .footer-name {
+      font-size: 1.1rem;
+      font-weight: 900;
+      color: var(--white);
+    }
+
+    .footer-name span { color: var(--red); }
+
+    footer p { margin-bottom: 6px; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
       nav { padding: 16px 20px; }
-      .hero { padding: 60px 20px 60px; }
-      .stats-bar { gap: 30px; }
+      .nav-links { display: none; }
+      .mv-section { grid-template-columns: 1fr; }
+      .stat { padding: 24px 20px; }
       .pricing-card { padding: 36px 24px; }
     }
   </style>
@@ -411,18 +610,45 @@
 
   <!-- NAV -->
   <nav>
-    <div class="nav-logo">Rebel<span>Agents</span>.ai</div>
-    <a href="#pricing" class="nav-cta">Get Access</a>
+    <a href="#" class="nav-brand">
+      <img src="https://media.base44.com/images/public/69b2d37fea1b464236e8d1bc/c561ad37d_generated_image.png" alt="Rebel Agents Logo" class="nav-logo-img" />
+      <span class="nav-name">Rebel<span>Agents</span>.ai</span>
+    </a>
+    <div class="nav-links">
+      <a href="#mission">Mission</a>
+      <a href="#agents">Agents</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#pricing" class="nav-cta">Get Access</a>
+    </div>
   </nav>
 
   <!-- HERO -->
   <section class="hero">
+    <div class="hero-bg"></div>
     <div class="hero-badge">⚡ AI That Fights For You</div>
-    <h1>Stop Getting <span>Taken Advantage Of.</span></h1>
-    <p>One subscription. Six AI agents. Each one built to protect you from being overcharged, misled, or left in the dark.</p>
-    <div class="hero-cta-group">
-      <a href="#pricing" class="btn-primary">Get Full Access — $19.99/mo</a>
-      <a href="https://rebelauto-diagnostics-ai.com" target="_blank" class="btn-secondary">Try Auto Agent Free</a>
+    <h1>Stop Getting<br/><span>Taken Advantage Of.</span></h1>
+    <p class="hero-sub">One subscription. Six AI agents. Each one built to protect you from being overcharged, misled, or left in the dark — in every area of your life.</p>
+    <div class="hero-ctas">
+      <a href="#pricing" class="btn-red">Get Full Access — $19.99/mo</a>
+      <a href="https://rebelauto-diagnostics-ai.com" target="_blank" class="btn-outline">Try Auto Agent Free →</a>
+    </div>
+    <div class="hero-trust">
+      <div class="trust-item"><div class="trust-dot"></div>No hidden fees</div>
+      <div class="trust-item"><div class="trust-dot"></div>Cancel anytime</div>
+      <div class="trust-item"><div class="trust-dot"></div>Free trial included</div>
+      <div class="trust-item"><div class="trust-dot"></div>All agents. One price.</div>
+    </div>
+  </section>
+
+  <!-- VIDEO SECTION -->
+  <section class="video-section">
+    <div class="video-wrapper">
+      <div class="video-placeholder">
+        <div class="video-lines"></div>
+        <a href="https://rebelauto-diagnostics-ai.com" target="_blank" class="play-btn">▶</a>
+        <div class="video-title">See Rebel Auto Agent in Action</div>
+        <div class="video-sub">Scan a fault code. Get a full AI diagnosis in under 30 seconds.</div>
+      </div>
     </div>
   </section>
 
@@ -444,17 +670,35 @@
       <div class="stat-number">24/7</div>
       <div class="stat-label">Always On</div>
     </div>
+    <div class="stat">
+      <div class="stat-number">$19.99</div>
+      <div class="stat-label">All Agents / Month</div>
+    </div>
   </div>
 
-  <!-- AGENTS GRID -->
-  <section class="agents-section">
+  <!-- MISSION & VISION -->
+  <section class="mv-section" id="mission">
+    <div class="mv-card">
+      <span class="mv-icon">🎯</span>
+      <div class="mv-label">Our Mission</div>
+      <div class="mv-title">Arm People With Information</div>
+      <p class="mv-text">Every day, ordinary people get overcharged, misled, and taken advantage of — not because they're not smart, but because they don't have access to the right information at the right time. Our mission is to change that. Rebel Agents puts expert-level AI knowledge in your pocket, so you always know what you're dealing with before someone else tells you a number.</p>
+    </div>
+    <div class="mv-card">
+      <span class="mv-icon">🔭</span>
+      <div class="mv-label">Our Vision</div>
+      <div class="mv-title">A World Where You're Never Left in the Dark</div>
+      <p class="mv-text">We envision a future where no one pays $150 just to learn what a car code means. Where no one gets trapped in a bad contract because they couldn't afford a lawyer. Where your credit score, your medical bill, your rights as a tenant — all of it is transparent, understandable, and actionable. Rebel Agents is building that future — one AI agent at a time.</p>
+    </div>
+  </section>
+
+  <!-- AGENTS -->
+  <section class="agents-section" id="agents">
     <div class="section-label">The Suite</div>
     <h2 class="section-title">Every Agent. One Subscription.</h2>
-    <p class="section-subtitle">Each agent tackles a different area where people get overcharged or misled.</p>
+    <p class="section-sub">Each agent tackles a different area where people get overcharged or misled.</p>
 
     <div class="agents-grid">
-
-      <!-- AUTO — LIVE -->
       <div class="agent-card live">
         <span class="agent-icon">🚗</span>
         <span class="agent-badge badge-live">Live Now</span>
@@ -463,51 +707,45 @@
         <a href="https://rebelauto-diagnostics-ai.com" target="_blank" class="agent-link">Launch Auto Agent →</a>
       </div>
 
-      <!-- HOME -->
       <div class="agent-card">
         <span class="agent-icon">🏠</span>
         <span class="agent-badge badge-soon">Coming Soon</span>
         <div class="agent-name">Rebel Home Agent</div>
         <div class="agent-desc">HVAC not cooling? Leak under the sink? Describe the issue and get an AI breakdown of what's wrong, what it costs, and which contractors to call.</div>
-        <span class="agent-link-soon">Notify me when live</span>
+        <span class="agent-link-soon">🔔 Notify me when live</span>
       </div>
 
-      <!-- HEALTH -->
       <div class="agent-card">
         <span class="agent-icon">🏥</span>
         <span class="agent-badge badge-soon">Coming Soon</span>
         <div class="agent-name">Rebel Health Agent</div>
         <div class="agent-desc">Upload your medical bill and let AI scan it for overcharges, billing errors, and negotiation opportunities. Americans overpay billions every year.</div>
-        <span class="agent-link-soon">Notify me when live</span>
+        <span class="agent-link-soon">🔔 Notify me when live</span>
       </div>
 
-      <!-- RIGHTS -->
       <div class="agent-card">
         <span class="agent-icon">⚖️</span>
         <span class="agent-badge badge-soon">Coming Soon</span>
         <div class="agent-name">Rebel Rights Agent</div>
-        <div class="agent-desc">Landlord issues? Workplace dispute? Know your rights instantly. Get plain English explanations and ready-to-send letters — no lawyer required.</div>
-        <span class="agent-link-soon">Notify me when live</span>
+        <div class="agent-desc">Landlord issues? Workplace dispute? Know your rights instantly. Plain English explanations and ready-to-send letters — no lawyer required.</div>
+        <span class="agent-link-soon">🔔 Notify me when live</span>
       </div>
 
-      <!-- CONTRACT -->
       <div class="agent-card">
         <span class="agent-icon">📋</span>
         <span class="agent-badge badge-soon">Coming Soon</span>
         <div class="agent-name">Rebel Contract Agent</div>
         <div class="agent-desc">Upload any contract and get an instant AI review. Flags risky clauses, explains confusing language, and tells you what to watch out for before you sign.</div>
-        <span class="agent-link-soon">Notify me when live</span>
+        <span class="agent-link-soon">🔔 Notify me when live</span>
       </div>
 
-      <!-- CREDIT -->
       <div class="agent-card">
         <span class="agent-icon">💳</span>
         <span class="agent-badge badge-soon">Coming Soon</span>
         <div class="agent-name">Rebel Credit Agent</div>
         <div class="agent-desc">Upload your credit report and get a personalized AI action plan. Identifies exactly what's hurting your score and gives you a step-by-step fix.</div>
-        <span class="agent-link-soon">Notify me when live</span>
+        <span class="agent-link-soon">🔔 Notify me when live</span>
       </div>
-
     </div>
   </section>
 
@@ -515,36 +753,39 @@
   <section class="pricing-section" id="pricing">
     <div class="section-label">Pricing</div>
     <h2 class="section-title">One Price. All Agents.</h2>
-    <p class="section-subtitle" style="margin-bottom: 40px;">Cancel anytime. No hidden fees.</p>
+    <p class="section-sub" style="margin-bottom: 40px;">No upsells. No tiers. Everything included.</p>
 
     <div class="pricing-card">
-      <span class="pricing-tag">Most Popular</span>
+      <span class="pricing-tag">⚡ Best Value</span>
       <div class="pricing-name">Rebel Full Access</div>
       <div class="pricing-price">$19.99</div>
-      <div class="pricing-period">per month — all agents included</div>
+      <div class="pricing-period">per month — all 6 agents included</div>
 
       <ul class="pricing-features">
-        <li><span class="check">✓</span> Unlimited diagnostics across all agents</li>
-        <li><span class="check">✓</span> Rebel Auto Agent — live now</li>
-        <li><span class="check">✓</span> Rebel Home Agent — coming soon</li>
-        <li><span class="check">✓</span> Rebel Health Agent — coming soon</li>
-        <li><span class="check">✓</span> Rebel Rights Agent — coming soon</li>
-        <li><span class="check">✓</span> Rebel Contract Agent — coming soon</li>
-        <li><span class="check">✓</span> Rebel Credit Agent — coming soon</li>
+        <li><span class="check">✓</span> Unlimited use across all agents</li>
+        <li><span class="check">✓</span> 🚗 Rebel Auto Agent — live now</li>
+        <li><span class="check">✓</span> 🏠 Rebel Home Agent — coming soon</li>
+        <li><span class="check">✓</span> 🏥 Rebel Health Agent — coming soon</li>
+        <li><span class="check">✓</span> ⚖️ Rebel Rights Agent — coming soon</li>
+        <li><span class="check">✓</span> 📋 Rebel Contract Agent — coming soon</li>
+        <li><span class="check">✓</span> 💳 Rebel Credit Agent — coming soon</li>
         <li><span class="check">✓</span> Early access to new agents as they launch</li>
-        <li><span class="check">✓</span> Priority support</li>
+        <li><span class="check">✓</span> Priority AI + support</li>
       </ul>
 
-      <a href="https://rebelauto-diagnostics-ai.com" class="pricing-cta">Get Full Access Now</a>
-      <p class="pricing-note">Start with Auto Agent free. Upgrade anytime to unlock the full suite.</p>
+      <a href="https://rebelauto-diagnostics-ai.com" class="pricing-cta">Get Full Access Now →</a>
+      <p class="pricing-note">Try Rebel Auto Agent free first. No credit card required to start.</p>
     </div>
   </section>
 
   <!-- FOOTER -->
   <footer>
-    <div class="footer-logo">Rebel<span>Agents</span>.ai</div>
+    <div class="footer-brand">
+      <img src="https://media.base44.com/images/public/69b2d37fea1b464236e8d1bc/c561ad37d_generated_image.png" alt="Rebel Agents Logo" class="footer-logo-img" />
+      <span class="footer-name">Rebel<span>Agents</span>.ai</span>
+    </div>
     <p>AI that fights for you. Built for real people facing real problems.</p>
-    <p style="margin-top: 12px;">© 2026 Rebel Agents. All rights reserved.</p>
+    <p style="margin-top: 8px; font-size: 0.78rem;">© 2026 Rebel Agents. All rights reserved.</p>
   </footer>
 
 </body>
