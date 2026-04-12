@@ -263,6 +263,32 @@ function QuickFeedback({ onDone, onDismiss }) {
         </button>
         <button onClick={onDismiss} style={{ flex: 1, background: 'transparent', border: '1px solid rgba(124,58,237,0.2)', borderRadius: 10, padding: '10px 0', color: '#7c6a9e', fontSize: 13, cursor: 'pointer', touchAction: 'manipulation' }}>Skip</button>
       </div>
+
+      {/* Demo Mode Banner (fixed bottom) */}
+      {isDemoMode && (
+        <div style={{ position: 'fixed', bottom: 16, left: '50%', transform: 'translateX(-50%)', background: 'linear-gradient(135deg,#7c3aed,#a855f7)', borderRadius: 20, padding: '10px 20px', display: 'flex', alignItems: 'center', gap: 10, boxShadow: '0 4px 20px rgba(124,58,237,0.5)', zIndex: 999, maxWidth: 340, width: 'calc(100% - 32px)' }}>
+          <span style={{ fontSize: 20 }}>🎙️</span>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 13, fontWeight: 800, color: '#fff' }}>Voice Mode Demo — Unlocked</div>
+            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.75)' }}>Mic & readout active. Subscribe to keep access.</div>
+          </div>
+        </div>
+      )}
+
+      {/* Voice Paywall Modal */}
+      {showVoicePaywall && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 20 }}>
+          <div style={{ background: '#18122b', border: '1px solid #2a1f4a', borderRadius: 20, padding: 28, maxWidth: 380, width: '100%' }}>
+            <div style={{ textAlign: 'center', marginBottom: 20 }}>
+              <div style={{ fontSize: 36, marginBottom: 8 }}>🎙️</div>
+              <div style={{ fontSize: 20, fontWeight: 900, color: '#f0eeff', marginBottom: 8 }}>Voice Mode is Pro</div>
+              <div style={{ fontSize: 14, color: '#7c6a9e', lineHeight: 1.6 }}>Speak your fault code & hear your diagnosis read aloud. Upgrade to unlock Voice Mode + unlimited diagnostics.</div>
+            </div>
+            <button onClick={goToUpgrade} style={{ ...S.btnPrimary, marginBottom: 10 }}>⚡ Upgrade — $19.99/mo</button>
+            <button onClick={() => setShowVoicePaywall(false)} style={{ ...S.btnGhost, width: '100%' }}>Maybe later</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -305,6 +331,32 @@ function DiagnosisCard({ diagnosis, vehicle }) {
         <button onClick={() => share(diagnosis, vehicle)} style={{ ...S.btnGhost, flex: 1, fontSize: 13 }}>📤 Share</button>
         <button onClick={() => exportPDF(diagnosis, vehicle)} style={{ ...S.btnGhost, flex: 1, fontSize: 13 }}>📄 Export</button>
       </div>
+
+      {/* Demo Mode Banner (fixed bottom) */}
+      {isDemoMode && (
+        <div style={{ position: 'fixed', bottom: 16, left: '50%', transform: 'translateX(-50%)', background: 'linear-gradient(135deg,#7c3aed,#a855f7)', borderRadius: 20, padding: '10px 20px', display: 'flex', alignItems: 'center', gap: 10, boxShadow: '0 4px 20px rgba(124,58,237,0.5)', zIndex: 999, maxWidth: 340, width: 'calc(100% - 32px)' }}>
+          <span style={{ fontSize: 20 }}>🎙️</span>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 13, fontWeight: 800, color: '#fff' }}>Voice Mode Demo — Unlocked</div>
+            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.75)' }}>Mic & readout active. Subscribe to keep access.</div>
+          </div>
+        </div>
+      )}
+
+      {/* Voice Paywall Modal */}
+      {showVoicePaywall && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 20 }}>
+          <div style={{ background: '#18122b', border: '1px solid #2a1f4a', borderRadius: 20, padding: 28, maxWidth: 380, width: '100%' }}>
+            <div style={{ textAlign: 'center', marginBottom: 20 }}>
+              <div style={{ fontSize: 36, marginBottom: 8 }}>🎙️</div>
+              <div style={{ fontSize: 20, fontWeight: 900, color: '#f0eeff', marginBottom: 8 }}>Voice Mode is Pro</div>
+              <div style={{ fontSize: 14, color: '#7c6a9e', lineHeight: 1.6 }}>Speak your fault code & hear your diagnosis read aloud. Upgrade to unlock Voice Mode + unlimited diagnostics.</div>
+            </div>
+            <button onClick={goToUpgrade} style={{ ...S.btnPrimary, marginBottom: 10 }}>⚡ Upgrade — $19.99/mo</button>
+            <button onClick={() => setShowVoicePaywall(false)} style={{ ...S.btnGhost, width: '100%' }}>Maybe later</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -389,6 +441,32 @@ function BluetoothMode({ vehicle, onCodeFound }) {
             </div>
         }
       </div>
+
+      {/* Demo Mode Banner (fixed bottom) */}
+      {isDemoMode && (
+        <div style={{ position: 'fixed', bottom: 16, left: '50%', transform: 'translateX(-50%)', background: 'linear-gradient(135deg,#7c3aed,#a855f7)', borderRadius: 20, padding: '10px 20px', display: 'flex', alignItems: 'center', gap: 10, boxShadow: '0 4px 20px rgba(124,58,237,0.5)', zIndex: 999, maxWidth: 340, width: 'calc(100% - 32px)' }}>
+          <span style={{ fontSize: 20 }}>🎙️</span>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 13, fontWeight: 800, color: '#fff' }}>Voice Mode Demo — Unlocked</div>
+            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.75)' }}>Mic & readout active. Subscribe to keep access.</div>
+          </div>
+        </div>
+      )}
+
+      {/* Voice Paywall Modal */}
+      {showVoicePaywall && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 20 }}>
+          <div style={{ background: '#18122b', border: '1px solid #2a1f4a', borderRadius: 20, padding: 28, maxWidth: 380, width: '100%' }}>
+            <div style={{ textAlign: 'center', marginBottom: 20 }}>
+              <div style={{ fontSize: 36, marginBottom: 8 }}>🎙️</div>
+              <div style={{ fontSize: 20, fontWeight: 900, color: '#f0eeff', marginBottom: 8 }}>Voice Mode is Pro</div>
+              <div style={{ fontSize: 14, color: '#7c6a9e', lineHeight: 1.6 }}>Speak your fault code & hear your diagnosis read aloud. Upgrade to unlock Voice Mode + unlimited diagnostics.</div>
+            </div>
+            <button onClick={goToUpgrade} style={{ ...S.btnPrimary, marginBottom: 10 }}>⚡ Upgrade — $19.99/mo</button>
+            <button onClick={() => setShowVoicePaywall(false)} style={{ ...S.btnGhost, width: '100%' }}>Maybe later</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -505,6 +583,32 @@ function WiFiOBDMode({ vehicle, onCodesFound }) {
           {loading ? '⏳ Connecting...' : '📶 Connect & Read Codes'}
         </button>
       </div>
+
+      {/* Demo Mode Banner (fixed bottom) */}
+      {isDemoMode && (
+        <div style={{ position: 'fixed', bottom: 16, left: '50%', transform: 'translateX(-50%)', background: 'linear-gradient(135deg,#7c3aed,#a855f7)', borderRadius: 20, padding: '10px 20px', display: 'flex', alignItems: 'center', gap: 10, boxShadow: '0 4px 20px rgba(124,58,237,0.5)', zIndex: 999, maxWidth: 340, width: 'calc(100% - 32px)' }}>
+          <span style={{ fontSize: 20 }}>🎙️</span>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 13, fontWeight: 800, color: '#fff' }}>Voice Mode Demo — Unlocked</div>
+            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.75)' }}>Mic & readout active. Subscribe to keep access.</div>
+          </div>
+        </div>
+      )}
+
+      {/* Voice Paywall Modal */}
+      {showVoicePaywall && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 20 }}>
+          <div style={{ background: '#18122b', border: '1px solid #2a1f4a', borderRadius: 20, padding: 28, maxWidth: 380, width: '100%' }}>
+            <div style={{ textAlign: 'center', marginBottom: 20 }}>
+              <div style={{ fontSize: 36, marginBottom: 8 }}>🎙️</div>
+              <div style={{ fontSize: 20, fontWeight: 900, color: '#f0eeff', marginBottom: 8 }}>Voice Mode is Pro</div>
+              <div style={{ fontSize: 14, color: '#7c6a9e', lineHeight: 1.6 }}>Speak your fault code & hear your diagnosis read aloud. Upgrade to unlock Voice Mode + unlimited diagnostics.</div>
+            </div>
+            <button onClick={goToUpgrade} style={{ ...S.btnPrimary, marginBottom: 10 }}>⚡ Upgrade — $19.99/mo</button>
+            <button onClick={() => setShowVoicePaywall(false)} style={{ ...S.btnGhost, width: '100%' }}>Maybe later</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -562,6 +666,32 @@ function SymptomMode({ vehicle, onDiagnosis }) {
           {loading ? '🤖 Analyzing...' : '🔍 Analyze My Car'}
         </button>
       </div>
+
+      {/* Demo Mode Banner (fixed bottom) */}
+      {isDemoMode && (
+        <div style={{ position: 'fixed', bottom: 16, left: '50%', transform: 'translateX(-50%)', background: 'linear-gradient(135deg,#7c3aed,#a855f7)', borderRadius: 20, padding: '10px 20px', display: 'flex', alignItems: 'center', gap: 10, boxShadow: '0 4px 20px rgba(124,58,237,0.5)', zIndex: 999, maxWidth: 340, width: 'calc(100% - 32px)' }}>
+          <span style={{ fontSize: 20 }}>🎙️</span>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 13, fontWeight: 800, color: '#fff' }}>Voice Mode Demo — Unlocked</div>
+            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.75)' }}>Mic & readout active. Subscribe to keep access.</div>
+          </div>
+        </div>
+      )}
+
+      {/* Voice Paywall Modal */}
+      {showVoicePaywall && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 20 }}>
+          <div style={{ background: '#18122b', border: '1px solid #2a1f4a', borderRadius: 20, padding: 28, maxWidth: 380, width: '100%' }}>
+            <div style={{ textAlign: 'center', marginBottom: 20 }}>
+              <div style={{ fontSize: 36, marginBottom: 8 }}>🎙️</div>
+              <div style={{ fontSize: 20, fontWeight: 900, color: '#f0eeff', marginBottom: 8 }}>Voice Mode is Pro</div>
+              <div style={{ fontSize: 14, color: '#7c6a9e', lineHeight: 1.6 }}>Speak your fault code & hear your diagnosis read aloud. Upgrade to unlock Voice Mode + unlimited diagnostics.</div>
+            </div>
+            <button onClick={goToUpgrade} style={{ ...S.btnPrimary, marginBottom: 10 }}>⚡ Upgrade — $19.99/mo</button>
+            <button onClick={() => setShowVoicePaywall(false)} style={{ ...S.btnGhost, width: '100%' }}>Maybe later</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -580,8 +710,28 @@ export default function Diagnose() {
   const [isChatting, setIsChatting] = useState(false);
   const [feedbackNudge, setFeedbackNudge] = useState('idle'); // idle | shown | submitted | dismissed
   const [device] = useState(() => detectDevice());
+  const [trialInfo, setTrialInfo] = useState({ subscription_status: 'trial', trial_exhausted: false, remaining: 3 });
+  const [showVoicePaywall, setShowVoicePaywall] = useState(false);
+
+  const isDemoMode = new URLSearchParams(window.location.search).get('demo') === 'voice';
+  const isPro = isDemoMode || trialInfo?.subscription_status === 'active';
 
   const STEPS = ['Vehicle', 'Method', 'Diagnose', 'Results'];
+
+  useEffect(() => {
+    callFunction('checkTrialStatus').then(r => { if (r.ok && r.data?.success) setTrialInfo(r.data); });
+  }, []);
+
+  useEffect(() => {
+    if (isDemoMode) setStep(3);
+  }, [isDemoMode]);
+
+  function handleVoiceUpgrade() { setShowVoicePaywall(true); }
+
+  async function goToUpgrade() {
+    const result = await callFunction('createCheckout', 'POST', {});
+    if (result.data?.url) window.location.href = result.data.url;
+  }
 
   async function runDiagnostic(code) {
     const c = code || faultCode;
@@ -862,6 +1012,32 @@ export default function Diagnose() {
           </div>
         )}
       </div>
+
+      {/* Demo Mode Banner (fixed bottom) */}
+      {isDemoMode && (
+        <div style={{ position: 'fixed', bottom: 16, left: '50%', transform: 'translateX(-50%)', background: 'linear-gradient(135deg,#7c3aed,#a855f7)', borderRadius: 20, padding: '10px 20px', display: 'flex', alignItems: 'center', gap: 10, boxShadow: '0 4px 20px rgba(124,58,237,0.5)', zIndex: 999, maxWidth: 340, width: 'calc(100% - 32px)' }}>
+          <span style={{ fontSize: 20 }}>🎙️</span>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 13, fontWeight: 800, color: '#fff' }}>Voice Mode Demo — Unlocked</div>
+            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.75)' }}>Mic & readout active. Subscribe to keep access.</div>
+          </div>
+        </div>
+      )}
+
+      {/* Voice Paywall Modal */}
+      {showVoicePaywall && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 20 }}>
+          <div style={{ background: '#18122b', border: '1px solid #2a1f4a', borderRadius: 20, padding: 28, maxWidth: 380, width: '100%' }}>
+            <div style={{ textAlign: 'center', marginBottom: 20 }}>
+              <div style={{ fontSize: 36, marginBottom: 8 }}>🎙️</div>
+              <div style={{ fontSize: 20, fontWeight: 900, color: '#f0eeff', marginBottom: 8 }}>Voice Mode is Pro</div>
+              <div style={{ fontSize: 14, color: '#7c6a9e', lineHeight: 1.6 }}>Speak your fault code & hear your diagnosis read aloud. Upgrade to unlock Voice Mode + unlimited diagnostics.</div>
+            </div>
+            <button onClick={goToUpgrade} style={{ ...S.btnPrimary, marginBottom: 10 }}>⚡ Upgrade — $19.99/mo</button>
+            <button onClick={() => setShowVoicePaywall(false)} style={{ ...S.btnGhost, width: '100%' }}>Maybe later</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
