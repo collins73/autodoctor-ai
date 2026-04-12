@@ -746,11 +746,14 @@ export default function Diagnose() {
             <div style={S.cardPad}>
               <div style={{ fontSize: 17, fontWeight: 700, marginBottom: 4 }}>Enter your fault code</div>
               <div style={{ fontSize: 13, color: '#7c6a9e', marginBottom: 18 }}>From your OBD-II scanner or code reader.</div>
-              <input
-                style={{ ...S.input, textAlign: 'center', fontSize: 28, fontWeight: 800, letterSpacing: 6, textTransform: 'uppercase', padding: '18px', marginBottom: 14 }}
-                placeholder="P0300" value={faultCode} maxLength={8}
-                onChange={e => setFaultCode(e.target.value.toUpperCase())}
-                onKeyDown={e => e.key === 'Enter' && runDiagnostic()} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+                <input
+                  style={{ ...S.input, textAlign: 'center', fontSize: 28, fontWeight: 800, letterSpacing: 6, textTransform: 'uppercase', padding: '18px', flex: 1 }}
+                  placeholder="P0300" value={faultCode} maxLength={8}
+                  onChange={e => setFaultCode(e.target.value.toUpperCase())}
+                  onKeyDown={e => e.key === 'Enter' && runDiagnostic()} />
+                <VoiceMicButton isPro={isPro} onResult={code => setFaultCode(code)} onUpgrade={handleVoiceUpgrade} />
+              </div>
               <div style={{ marginBottom: 18 }}>
                 <div style={{ fontSize: 11, fontWeight: 700, color: '#7c6a9e', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Quick select</div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
@@ -792,6 +795,19 @@ export default function Diagnose() {
         {step === 4 && !isSending && diagnosis && (
           <div>
             <DiagnosisCard diagnosis={diagnosis} vehicle={vehicle} />
+
+            {/* ── Voice Readout Bar ── */}
+            <div style={{ ...S.card, marginBottom: 14 }}>
+              <div style={{ ...S.cardPad, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: '#e2d9f3' }}>
+                    🔊 Voice Readout {!isPro && <span style={{ fontSize: 10, background: 'rgba(251,146,60,0.15)', color: '#fb923c', borderRadius: 4, padding: '2px 6px', marginLeft: 4 }}>PRO</span>}
+                  </div>
+                  <div style={{ fontSize: 11, color: '#7c6a9e', marginTop: 3 }}>Hear your full diagnosis read aloud</div>
+                </div>
+                <VoiceReadoutButton diagnosis={diagnosis} isPro={isPro} onUpgrade={handleVoiceUpgrade} />
+              </div>
+            </div>
 
             {/* ── Feedback Nudge ── */}
             {feedbackNudge !== 'dismissed' && feedbackNudge !== 'submitted' && (
