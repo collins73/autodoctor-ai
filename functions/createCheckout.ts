@@ -28,7 +28,7 @@ Deno.serve(async (req) => {
     body.set('mode', 'subscription');
     body.set('line_items[0][price_data][currency]', 'usd');
     body.set('line_items[0][price_data][recurring][interval]', 'month');
-    body.set('line_items[0][price_data][unit_amount]', '999');
+    body.set('line_items[0][price_data][unit_amount]', '1999');
     body.set('line_items[0][price_data][product_data][name]', 'Rebel Auto Agent Pro');
     body.set('line_items[0][price_data][product_data][description]', 'Unlimited diagnostics, shop finder & priority support');
     body.set('line_items[0][quantity]', '1');
