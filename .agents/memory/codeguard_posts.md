@@ -1,6 +1,7 @@
 # CodeGuard — LinkedIn Content Series
 
 ## Post 1 — Launch/Intro (Week 1, Monday)
+✅ POSTED: 2026-04-22 13:05 ET
 🛡️ I built an AI-powered security scanner — and it already found vulnerabilities I missed.
 
 Most developers write code fast. Security reviews happen slow — if at all.
@@ -26,6 +27,7 @@ https://cyber-security-code-scan.base44.app
 ---
 
 ## Post 2 — Pain Point (Week 1, Wednesday)
+✅ POSTED: 2026-04-22 13:06 ET
 💀 95% of security breaches are caused by vulnerabilities that were already in the code.
 
 They weren't sophisticated attacks. They were overlooked mistakes.
