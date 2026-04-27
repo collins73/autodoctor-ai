@@ -1,15 +1,10 @@
 # ========================
-# 🔐 Secret Keys & Env Files
+# 🔐 Secrets & Environment
 # ========================
 .env
-.env.local
-.env.development
-.env.production
-.env.staging
+.env.*
 *.env
 .agents/.env
-
-# Secret key files
 secrets.json
 secrets.yaml
 secrets.yml
@@ -17,6 +12,10 @@ config/secrets.*
 *secret*
 *api_key*
 *private_key*
+stripe_keys.txt
+stripe.json
+github_token.txt
+token.txt
 
 # ========================
 # Node / React
@@ -60,13 +59,10 @@ logs/
 *.log.*
 
 # ========================
-# Stripe
+# Temp & Scratch Files
 # ========================
-stripe_keys.txt
-stripe.json
-
-# ========================
-# GitHub Tokens
-# ========================
-github_token.txt
-token.txt
+tmp/
+temp/
+*.tmp
+*.bak
+app/tmp/
