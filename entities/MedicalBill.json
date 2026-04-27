@@ -1,0 +1,52 @@
+{
+  "type": "object",
+  "properties": {
+    "user_name": {
+      "type": "string"
+    },
+    "user_email": {
+      "type": "string"
+    },
+    "bill_type": {
+      "type": "string",
+      "enum": [
+        "Medical Bill",
+        "EOB - Explanation of Benefits",
+        "Insurance Statement",
+        "Hospital Bill",
+        "Prescription Bill",
+        "Other"
+      ]
+    },
+    "raw_text": {
+      "type": "string"
+    },
+    "provider_name": {
+      "type": "string"
+    },
+    "service_date": {
+      "type": "string"
+    },
+    "total_billed": {
+      "type": "number"
+    },
+    "total_owed": {
+      "type": "number"
+    },
+    "insurance_paid": {
+      "type": "number"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "analyzed",
+        "disputed",
+        "resolved"
+      ],
+      "default": "pending"
+    }
+  },
+  "required": [],
+  "name": "MedicalBill"
+}

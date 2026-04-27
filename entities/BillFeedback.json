@@ -1,0 +1,36 @@
+{
+  "type": "object",
+  "properties": {
+    "bill_id": {
+      "type": "string"
+    },
+    "user_name": {
+      "type": "string"
+    },
+    "user_email": {
+      "type": "string"
+    },
+    "helpfulness_rating": {
+      "type": "number"
+    },
+    "accuracy_rating": {
+      "type": "number"
+    },
+    "would_pay": {
+      "type": "string",
+      "enum": [
+        "Yes definitely",
+        "Maybe",
+        "No"
+      ]
+    },
+    "feedback_text": {
+      "type": "string"
+    },
+    "source": {
+      "type": "string"
+    }
+  },
+  "required": [],
+  "name": "BillFeedback"
+}

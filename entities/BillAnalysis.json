@@ -1,0 +1,49 @@
+{
+  "type": "object",
+  "properties": {
+    "bill_id": {
+      "type": "string"
+    },
+    "plain_english_summary": {
+      "type": "string"
+    },
+    "line_items": {
+      "type": "string"
+    },
+    "potential_errors": {
+      "type": "string"
+    },
+    "overcharge_flags": {
+      "type": "string"
+    },
+    "negotiation_tips": {
+      "type": "string"
+    },
+    "dispute_letter": {
+      "type": "string"
+    },
+    "next_steps": {
+      "type": "string"
+    },
+    "error_count": {
+      "type": "number"
+    },
+    "potential_savings": {
+      "type": "number"
+    },
+    "confidence_score": {
+      "type": "number"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "processing",
+        "complete",
+        "error"
+      ],
+      "default": "processing"
+    }
+  },
+  "required": [],
+  "name": "BillAnalysis"
+}
